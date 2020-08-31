@@ -1,0 +1,14 @@
+#inputs {
+    padding-top: 200px;
+    display: flex;
+    justify-content: center;
+}
+
+.full_width {
+    width: 500px;
+}
+
+#submit_button {
+    margin-left: 10px;
+    font-weight: 250;
+}

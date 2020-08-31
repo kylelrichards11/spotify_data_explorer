@@ -1,0 +1,11 @@
+{
+  "targets": {
+    "spotifydataexplorer-81773": {
+      "hosting": {
+        "spotify-data-explorer": [
+          "spotifydataexplorer-81773"
+        ]
+      }
+    }
+  }
+}

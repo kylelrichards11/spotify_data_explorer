@@ -1,0 +1,8 @@
+.DS_Store
+.cache-*
+.vscode/
+__pycache__/
+notes.txt
+data/
+venv/
+api_vars.sh

@@ -1,0 +1,50 @@
+#header {
+    padding-top: 30px;
+    text-align: center;
+    font-size: 45px;
+    font-weight: 111;
+    margin-bottom: 10px;
+}
+
+#header_info {
+    text-align: center;
+    font-size: 27px;
+    font-weight: 100;
+    margin-bottom: 0px;
+}
+
+#inputs {
+    display: flex;
+    justify-content: center;
+}
+
+#graph {
+    display: block; 
+    height: 700px;
+}
+
+.full_width {
+    width: 500px;
+}
+
+#submit_button {
+    margin-left: 10px;
+    font-weight: 250;
+}
+
+.info_line {
+    font-size: 17px;
+    font-weight: 200;
+}
+
+#buttons{
+    text-align: center;
+}
+
+#timescale{
+    margin-right: 25px;
+}
+
+#stat{
+    margin-left: 25px;
+}

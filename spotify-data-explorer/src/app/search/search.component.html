@@ -1,0 +1,16 @@
+<div class="paper">
+    <div id="inputs">
+        <form class="input_form" (ngSubmit)="submit_artist()" novalidate>
+            <mat-form-field class="full_width">
+                <mat-label>Artist</mat-label>
+                <input name="a_input" id="artist_input" type="text" matInput [formControl]="artist_control" [matAutocomplete]="auto">
+                <mat-autocomplete #auto="matAutocomplete" [displayWith]="artist_display_fn">
+                    <mat-option (onSelectionChange)="select_artist(option)" *ngFor="let option of artist_filtered_options | async" [value]="option">
+                        {{option.artist_name}}
+                    </mat-option>
+                </mat-autocomplete>
+            </mat-form-field>
+            <button submit mat-button id="submit_button">Submit</button>
+        </form>
+    </div>
+</div>

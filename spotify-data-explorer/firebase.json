@@ -1,0 +1,19 @@
+{
+  "hosting": [
+    {
+      "target": "spotify-data-explorer",
+      "public": "dist/spotify-data-explorer",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
+    }
+  ]
+}
