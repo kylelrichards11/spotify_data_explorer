@@ -35,6 +35,8 @@ class FireManager():
 
         song_collection : firestore.collection - the collection for the song
 
+        history_doc : firestore.document - the firestore document representing the history document
+
         artist_id : str - the id of the song's artist
 
         track_id : str - the id of the song
@@ -128,6 +130,18 @@ class FireManager():
         })
 
     def _init_history(self, history_doc, year):
+        """ Adds the year to the history document in firebase 
+        
+        Parameters
+        ----------
+        history_doc : firestore.document - the firestore document representing the history document
+
+        year : int - the year to add
+
+        Returns
+        -------
+        None
+        """
         months = {}
         for month in range(1, 13):
             months[f"{month}"] = {
