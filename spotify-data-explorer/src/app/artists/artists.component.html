@@ -27,9 +27,9 @@
     </div>
     <br>
     <div id="buttons">
-        <mat-button-toggle-group id='timescale' value="years">
+        <mat-button-toggle-group id='timescale' value="months">
+            <mat-button-toggle value="months" (click)="change_timescale('month')">Month</mat-button-toggle>
             <mat-button-toggle value="years" (click)="change_timescale('year')">Year</mat-button-toggle>
-            <mat-button-toggle value="year_months" (click)="change_timescale('month')">Month</mat-button-toggle>
         </mat-button-toggle-group>
         <mat-button-toggle-group id='stat' value="listens">
             <mat-button-toggle value="listens" (click)="change_stat('counts')">Listens</mat-button-toggle>

@@ -35,7 +35,7 @@ export interface SongListItem {
 
     /* GRAPH VARIABLES */
     graph;
-    active_dataset_time = "year";
+    active_dataset_time = "month";
     active_dataset_stat = "counts";
     active_time_unit;
     datasets = {
@@ -108,7 +108,7 @@ export interface SongListItem {
                     data: [0, 0, 0, 0, 0, 0],
                     backgroundColor: '#08a1d4'
                 }],
-                "labels": this.labels["year"]
+                "labels": this.labels["month"]
             },
             "options": {
                 maintainAspectRatio: false,
@@ -143,7 +143,7 @@ export interface SongListItem {
                 },
                 title: {
                     display: true,
-                    text: "Listens per Year",
+                    text: "Listens per Month",
                     fontSize: 18,
                     fontFamily: "Arial",
                     fontColor: "black",
@@ -200,7 +200,6 @@ export interface SongListItem {
                 let month_id = month + '/' + year;
                 month_counts[month_id] = val[year][month]["listen_count"];
                 month_raw_times[month_id] = val[year][month]["listen_time"];
-                // console.log(val[year][month]["uq_artists"])
                 month_unique_artists[month_id] = val[year][month]["uq_artists"].length
                 month_unique_songs[month_id] = val[year][month]["uq_songs"].length
                 val[year][month]["uq_artists"].forEach(artist => {
