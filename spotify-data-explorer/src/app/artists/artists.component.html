@@ -19,8 +19,8 @@
         </form>
     </div>
     <div>
-        <p class="info_line">First song listened to was <span class="song_name">{{first_song_name}}</span> on {{first_song_date}}</p>
-        <p class="info_line">Last song listened to was <span class="song_name">{{last_song_name}}</span> on {{last_song_date}}</p>
+        <p class="info_line">First song listened to was <a mat-button id="first_song_link" class="song_name">{{first_song_name}}</a> on {{first_song_date}}</p>
+        <p class="info_line">Last song listened to was <a mat-button id="last_song_link" class="song_name">{{last_song_name}}</a> on {{last_song_date}}</p>
     </div>
     <div id="graph">
         <canvas id="canvas"></canvas>

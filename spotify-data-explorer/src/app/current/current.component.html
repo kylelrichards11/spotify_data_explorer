@@ -3,12 +3,12 @@
         <!-- <mat-grid-tile colspan="1" rowspan="8"><img class="tile_img" src="assets/default_img.png"></mat-grid-tile> -->
         <mat-grid-tile colspan="1" rowspan="12"><img class="tile_img" src="{{current_album_img}}"></mat-grid-tile>
         <mat-grid-tile></mat-grid-tile>
-        <mat-grid-tile><span class="current_text">{{current_song}}</span></mat-grid-tile>
+        <mat-grid-tile><a class="current_text" mat-button id="song_link">{{current_song}}</a></mat-grid-tile>
         <mat-grid-tile>{{track_listens}} listens for {{track_time}}</mat-grid-tile>
         <mat-grid-tile>{{track_first}}</mat-grid-tile>
         <mat-grid-tile>{{track_last}}</mat-grid-tile>
         <mat-grid-tile></mat-grid-tile>
-        <mat-grid-tile><span class="current_text">{{current_artist}}</span></mat-grid-tile>
+        <mat-grid-tile><a class="current_text" mat-button id="artist_link">{{current_artist}}</a></mat-grid-tile>
         <mat-grid-tile>{{artist_listens}} listens for {{artist_time}}</mat-grid-tile>
         <mat-grid-tile>{{artist_first}}</mat-grid-tile>
         <mat-grid-tile>{{artist_last}}</mat-grid-tile>

@@ -74,6 +74,7 @@ export class CurrentComponent implements OnInit {
             this.artist_last = ""
         }
         else {
+            (<HTMLAnchorElement>document.getElementById("artist_link")).href = '/artist/' + val["artist_id"]
             this.artist_listens = val["listen_count"]
             let time_info = this.transform_time(val["listen_time"])
             this.artist_time = time_info[0] + " " + time_info[1]
@@ -90,6 +91,7 @@ export class CurrentComponent implements OnInit {
             this.track_last = ""
         }
         else {
+            (<HTMLAnchorElement>document.getElementById("song_link")).href = '/song/' + val["track_id"]
             this.track_listens = val["listen_count"]
             let time_info = this.transform_time(val["listen_time"])
             this.track_time = time_info[0] + " " + time_info[1]

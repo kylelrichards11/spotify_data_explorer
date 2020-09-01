@@ -203,14 +203,18 @@ export class ArtistsComponent implements OnInit {
         let time_info = this.transform_time(val["listen_time"]);
         this.listen_time = time_info[0]
         this.listen_time_unit = time_info[1].toLowerCase()
-        this.unique_songs = val["tracks"].length
+        this.unique_songs = val["tracks"].length;
+        
+        (<HTMLAnchorElement>document.getElementById("first_song_link")).href = '/song/' + val["first_listen"]["track_id"]
         this.first_song_name = val["first_listen"]["song_name"]
         let flt = val["first_listen_time"]
-        this.first_song_date = MONTHS[flt["month"] - 1] + " " + flt["day"] + ", " + flt["year"]
+        this.first_song_date = MONTHS[flt["month"] - 1] + " " + flt["day"] + ", " + flt["year"];
 
+        (<HTMLAnchorElement>document.getElementById("last_song_link")).href = '/song/' + val["last_listen"]["track_id"]
         this.last_song_name = val["last_listen"]["song_name"]
         let llt = val["last_listen_time"]
         this.last_song_date = MONTHS[llt["month"] - 1] + " " + llt["day"] + ", " + llt["year"]
+        
         this.set_chart_data(val["tracks"])
         this.update_song_options(val);
     }
