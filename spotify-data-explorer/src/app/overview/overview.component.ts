@@ -21,23 +21,8 @@ export class OverviewComponent implements OnInit {
     current_artist = "";
     current_album_img = "";
 
-    total_tracks;
-    unique_tracks;
-    unique_artists;
-    time_hours;
-    time_days;
-
     ngOnInit() {
         this.item.subscribe(val => this.update_current(val))
-        let overview_data = (OVERVIEW_DATA as any).default;
-        this.total_tracks = overview_data['total_tracks'];
-        this.unique_tracks = overview_data['unique_tracks'];
-        this.unique_artists = overview_data['unique_artists'];
-        let time_ms = overview_data['total_ms'];
-        let time_min = time_ms/1000/60;
-        let time_hours = time_min/60;
-        this.time_hours = (Math.round(100 * time_min/60) / 100).toFixed(2);
-        this.time_days = (Math.round(100 * time_hours/24) / 100).toFixed(2);
     }
 
     update_current(val) {
