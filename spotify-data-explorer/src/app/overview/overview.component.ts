@@ -2,8 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 
-import * as OVERVIEW_DATA from '../../assets/overview.json';
-
 export interface Item { name: string; }
 
 @Component({
