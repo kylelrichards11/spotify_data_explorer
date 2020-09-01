@@ -1,6 +1,7 @@
 <div class="paper">
     <h1 id="header" class="mat-display-1">{{artist_name}}</h1>
     <h1 id="header_info" class="mat-display-2">{{listen_count}} listens for {{listen_time}} {{listen_time_unit}}</h1>
+    <h1 id="header_info" class="mat-display-2">{{unique_songs}} unique songs</h1>
     <div id="inputs">
         <form class="input_form" (ngSubmit)="submit_song()" novalidate>
             <mat-form-field class="full_width">
@@ -33,6 +34,7 @@
         <mat-button-toggle-group id='stat' value="listens">
             <mat-button-toggle value="listens" (click)="change_stat('counts')">Listens</mat-button-toggle>
             <mat-button-toggle value="time" (click)="change_stat('times')">Time</mat-button-toggle>
+            <mat-button-toggle value="uq_songs" (click)="change_stat('uq_songs')">Unique Songs</mat-button-toggle>
         </mat-button-toggle-group>
     </div>
     <br>
