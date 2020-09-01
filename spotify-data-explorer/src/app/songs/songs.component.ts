@@ -36,7 +36,7 @@ export interface SongListItem {
 
     /* GRAPH VARIABLES */
     graph;
-    active_dataset_time = "year";
+    active_dataset_time = "month";
     active_dataset_stat = "counts";
     active_time_unit;
     datasets = {
@@ -96,7 +96,7 @@ export interface SongListItem {
                     data: [0, 0, 0, 0, 0, 0],
                     backgroundColor: '#08a1d4'
                 }],
-                "labels": this.labels["year"]
+                "labels": this.labels["month"]
             },
             "options": {
                 maintainAspectRatio: false,
@@ -131,7 +131,7 @@ export interface SongListItem {
                 },
                 title: {
                     display: true,
-                    text: "Listens per Year",
+                    text: "Listens per Month",
                     fontSize: 18,
                     fontFamily: "Arial",
                     fontColor: "black",
