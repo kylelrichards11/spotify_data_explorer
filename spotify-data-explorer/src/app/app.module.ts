@@ -28,6 +28,7 @@ import { CurrentComponent } from './current/current.component';
 import { MenuBarComponent } from './menu-bar/menu-bar.component';
 import { SongsComponent } from './songs/songs.component';
 import { SearchComponent } from './search/search.component';
+import { HistoryComponent } from './history/history.component';
 
 @NgModule({
   declarations: [
@@ -37,7 +38,8 @@ import { SearchComponent } from './search/search.component';
     CurrentComponent,
     MenuBarComponent,
     SongsComponent,
-    SearchComponent
+    SearchComponent,
+    HistoryComponent
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,24 @@
+<div class="paper">
+    <!-- <h1 id="header" class="mat-display-1">Listening History</h1> -->
+    <h1 id="header_info" class="mat-display-2">{{all_listen_count}} listens for {{all_listen_time}} {{all_listen_time_unit}}</h1>
+    <h1 id="header_info" class="mat-display-2">{{all_unique_songs}} unique songs</h1>
+    <h1 id="header_info" class="mat-display-2">{{all_unique_artists}} unique artists</h1>
+    <div id="graph">
+        <canvas id="canvas"></canvas>
+    </div>
+    <br>
+    <div id="buttons">
+        <mat-button-toggle-group id='timescale' value="years">
+            <mat-button-toggle value="years" (click)="change_timescale('year')">Year</mat-button-toggle>
+            <mat-button-toggle value="year_months" (click)="change_timescale('month')">Month</mat-button-toggle>
+        </mat-button-toggle-group>
+        <mat-button-toggle-group id='stat' value="listens">
+            <mat-button-toggle value="listens" (click)="change_stat('counts')">Listens</mat-button-toggle>
+            <mat-button-toggle value="time" (click)="change_stat('times')">Time</mat-button-toggle>
+            <mat-button-toggle value="uq_artist" (click)="change_stat('uq_artists')">Unique Artists</mat-button-toggle>
+            <mat-button-toggle value="uq_song" (click)="change_stat('uq_songs')">Unique Songs</mat-button-toggle>
+        </mat-button-toggle-group>
+    </div>
+    <br>
+    <br>
+</div>

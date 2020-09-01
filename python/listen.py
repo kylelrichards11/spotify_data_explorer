@@ -26,7 +26,7 @@ class FireManager():
         })
         self.db = firestore.client()
 
-    def _add_listen(self, artist_collection, song_collection, artist_id, track_id, track_details):
+    def _add_listen(self, artist_collection, song_collection, history_doc, artist_id, track_id, track_details):
         """ Adds a listen event to the firebase 
         
         Parameters
@@ -50,7 +50,7 @@ class FireManager():
         artist_collection.document(artist_id).update({
             "listen_count": Increment(1),
             "listen_time": Increment(track_details["ms_played"]),
-            "last_listen_time": self._get_time_info(track_details["timestamp"]),
+            "last_listen_time": track_details["time_info"],
             "last_listen": {"track_id":track_id, "song_name":track_details["song_name"]}
         })
 
@@ -60,8 +60,20 @@ class FireManager():
         song_collection.document(track_id).update({
             "listen_count": Increment(1),
             "listen_time": Increment(track_details["ms_played"]),
-            "last_listen": self._get_time_info(track_details["timestamp"]),
+            "last_listen": track_details["time_info"],
             "listens": firestore.ArrayUnion([listen_info])
+        })
+
+        # Add to History
+        history_doc.update({
+            f"{track_details['time_info']['year']}" : {
+                f"{track_details['time_info']['month']}" : {
+                    "listen_count": Increment(1),
+                    "listen_time": Increment(track_details["ms_played"]),
+                    "uq_artists": firestore.ArrayUnion([{"artist_id":artist_id, "artist_name":track_details["artist_name"]}]),
+                    "uq_songs": firestore.ArrayUnion([{"track_id":track_id, "song_name":track_details["song_name"]}])
+                }
+            }
         })
         
     def _get_time_info(self, dt):
@@ -115,6 +127,19 @@ class FireManager():
             "list": firestore.ArrayUnion([{"artist_id":artist_id, "artist_name":track_details["artist_name"]}])
         })
 
+    def _init_history(self, history_doc, year):
+        months = {}
+        for month in range(1, 13):
+            months[f"{month}"] = {
+                "listen_count": 0,
+                "listen_time": 0,
+                "uq_artists": [],
+                "uq_songs": []
+            }
+        history_doc.update({
+            f"{year}": months
+        })
+
     def _init_song(self, artist_collection, song_collection, artist_id, track_id, track_details):
         """ Adds a new song to firebase for the first time 
         
@@ -165,6 +190,8 @@ class FireManager():
         -------
         None
         """
+        track_details["time_info"] = self._get_time_info(track_details["timestamp"])
+
         # Check if artist exists
         artist_collection = self.db.collection(u"artists")
         artist = artist_collection.document(artist_id).get()
@@ -177,8 +204,15 @@ class FireManager():
         if not song.exists:
             self._init_song(artist_collection, song_collection, artist_id, track_id, track_details)
 
+        # Check if history year exists
+        year = track_details["time_info"]["year"]
+        history_doc = self.db.collection(u"utils").document(u"history")
+        history = history_doc.get().to_dict()
+        if f"{year}" not in history:
+            self._init_history(history_doc, year)
+
         # Increase stats
-        self._add_listen(artist_collection, song_collection, artist_id, track_id, track_details)
+        self._add_listen(artist_collection, song_collection, history_doc, artist_id, track_id, track_details)
 
     def update_current(self, info):
         """ Updates the information at overview/current
