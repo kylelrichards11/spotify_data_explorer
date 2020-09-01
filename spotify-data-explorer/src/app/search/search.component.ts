@@ -58,8 +58,8 @@ export class SearchComponent implements OnInit {
         );
     }
 
-    select_artist(option){
-        this.selected_artist = option;
+    select_artist(event){
+        this.selected_artist = event.option.value;
     }
 
     submit_artist() {

@@ -8,9 +8,8 @@
                 <mat-label>Song</mat-label>
                 <input name="a_input" id="song_input" type="text" matInput [formControl]="song_control"
                     [matAutocomplete]="auto">
-                <mat-autocomplete #auto="matAutocomplete" [displayWith]="song_display_fn">
-                    <mat-option (onSelectionChange)="select_song(option)"
-                        *ngFor="let option of song_filtered_options | async" [value]="option">
+                <mat-autocomplete #auto="matAutocomplete" [displayWith]="song_display_fn" (optionSelected)="select_song($event)">
+                    <mat-option *ngFor="let option of song_filtered_options | async" [value]="option">
                         {{option.song_name}}
                     </mat-option>
                 </mat-autocomplete>

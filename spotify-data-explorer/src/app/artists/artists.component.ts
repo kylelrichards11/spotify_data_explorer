@@ -187,8 +187,8 @@ export class ArtistsComponent implements OnInit {
         );
     }
 
-    select_song(option) {
-        this.selected_song = option;
+    select_song(event) {
+        this.selected_song = event.option.value;
     }
 
     submit_song() {
