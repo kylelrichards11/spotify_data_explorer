@@ -48,3 +48,8 @@
 #stat{
     margin-left: 25px;
 }
+
+.song_name {
+    font-size: 18px;
+    font-weight: 400;
+}
