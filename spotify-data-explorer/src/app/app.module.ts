@@ -3,7 +3,6 @@ import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { OverviewComponent } from './overview/overview.component';
 import { ArtistsComponent } from './artists/artists.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -33,7 +32,6 @@ import { HistoryComponent } from './history/history.component';
 @NgModule({
   declarations: [
     AppComponent,
-    OverviewComponent,
     ArtistsComponent,
     CurrentComponent,
     MenuBarComponent,
