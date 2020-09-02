@@ -374,7 +374,7 @@ class Listener():
             }
             details["album_img"] = track["item"]["album"]["images"][0]["url"]
             return details
-        except KeyError as e:
+        except IndexError as e:
             details["album_img"] = "assets/default_img.png"
             return details
 
