@@ -466,6 +466,7 @@ class Listener():
         
         """
         if track_id != self.last_current_update_id:
+            self.last_current_update_id = track_id
             track_details = self._get_track_details(track_id, track)
             track_details["track_id"] = track_id
             self.firebase.update_current(track_details)
@@ -497,7 +498,6 @@ class Listener():
                     continue
 
                 current_id = self._get_track_id(current_track)
-                self._update_current(current_id, current_track)
 
                 # Save info if current changed
                 last_info = None
@@ -511,11 +511,13 @@ class Listener():
                     artist_id = self._get_artist_id(last_current)
                     try:
                         self.firebase.add_song(last_current_id, artist_id, last_info)
+                        self._update_current(current_id, current_track)
                     except ServiceUnavailable as e:
                         print("Reinitializing Firebase")
                         self.firebase = FireManager()
                         time.sleep(5)
                         self.firebase.add_song(last_current_id, artist_id, last_info)
+                        self._update_current(current_id, current_track)
 
                 # Update last
                 last_current_id = current_id
