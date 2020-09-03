@@ -511,13 +511,13 @@ class Listener():
                     artist_id = self._get_artist_id(last_current)
                     try:
                         self.firebase.add_song(last_current_id, artist_id, last_info)
-                        self._update_current(current_id, current_track)
                     except ServiceUnavailable as e:
                         print("Reinitializing Firebase")
                         self.firebase = FireManager()
                         time.sleep(5)
                         self.firebase.add_song(last_current_id, artist_id, last_info)
-                        self._update_current(current_id, current_track)
+       
+                self._update_current(current_id, current_track)
 
                 # Update last
                 last_current_id = current_id
