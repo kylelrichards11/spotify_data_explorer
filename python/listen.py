@@ -264,34 +264,6 @@ class Listener():
         self.last_current_update_id = ''
         self.firebase = FireManager()
 
-    def _add_to_firebase(self, info):
-        """ Adds the listened to track to the json file 
-        
-        Parameters
-        ----------
-        info : tuple - the tuple of information for the song to add
-
-        Returns
-        -------
-        None
-
-        """
-        artist_name, track_name, dt_str, ms_played = info
-        info_dict = {"artist_name":artist_name, "track_name":track_name, "ms_played":ms_played}
-        dt_str = re.sub(r':[0-9][0-9] UTC', '', dt_str)
-        dt = datetime.strptime(dt_str, '%Y-%m-%d %H:%M')
-        info_dict["year"] = dt.date().year
-        info_dict["month"] = dt.date().month
-        info_dict["day"] = dt.date().day
-        info_dict["weekday"] = dt.weekday()
-        info_dict["hour"] = dt.time().hour
-        info_dict["minute"] = dt.time().minute
-        info_dict["year_month"] = f"{info_dict['year']}{0 if info_dict['month'] < 10 else ''}{info_dict['month']}"
-        info_dict["timestamp"] = int(dt.timestamp())
-        print(f"{track_name} by {artist_name}")
-        with open(f"recent.json", "a+") as f:
-            f.write(json.dumps(info_dict))
-
     def _check_if_podcast(self, track):
         """ Checks if the track is a podcast
         
