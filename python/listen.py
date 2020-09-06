@@ -4,7 +4,6 @@ from datetime import datetime, timezone
 import time
 import re
 import requests
-import smtplib
 import sys
 
 import spotipy
@@ -15,38 +14,11 @@ from google.api_core.exceptions import ServiceUnavailable
 import firebase_admin
 from firebase_admin import credentials, firestore
 
+from gmail import Gmail
+
 def print_track(track):
     with open(f"track.json", "w") as f:
         f.write(json.dumps(track))
-
-class Email():
-    """ Sends an email """
-    def __init__(self):
-        self.email = "pythontextnotif@gmail.com"
-        self.pas = input("Password:\n")
-        self.address_to = "kyleredsox11@gmail.com"
-
-        self.smtp = "smtp.gmail.com"
-        self.port = 587
-
-    def send(self, msg):
-        """ Sends a message 
-        
-        Parameters
-        ----------
-        msg : string - the message to send
-
-        Returns
-        -------
-        None
-
-        """
-        self.server = smtplib.SMTP(self.smtp, self.port)
-        self.server.starttls()
-        self.server.login(self.email, self.pas)
-        self.server.sendmail(self.email, self.address_to, f"{msg}")
-        self.server.quit()
-
 
 class FireManager():
     """ Deals with all firebase interactions """
@@ -516,8 +488,8 @@ class Listener():
         None
         """
         
-        email = Email()
-        email.send("Starting Listen")
+        gmail = Gmail()
+        gmail.send_message("Starting Listen")
         last_current = self.spotify.current_user_playing_track()
         last_current_id = self._get_track_id(last_current)
 
@@ -570,7 +542,7 @@ class Listener():
             except:
                 msg = f"Unhandled Error: {sys.exc_info()[0]}"
                 print(msg)
-                email.send(msg)
+                gmail.send_message(msg)
                 raise
                 exit()
 

@@ -6,3 +6,5 @@ notes.txt
 data/
 venv/
 api_vars.sh
+*.pickle
+credentials.json
