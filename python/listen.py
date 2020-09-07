@@ -5,6 +5,7 @@ import time
 import re
 import requests
 import sys
+import hashlib
 
 import spotipy
 import spotipy.util as util
@@ -261,8 +262,15 @@ class Listener():
         self.spotify = self._init_spotify()
         self.last_released_id = ''
         self.last_released_sec = 0
-        self.last_current_update_id = ''
+        self.last_update_id = ''
         self.firebase = FireManager()
+        self.id_map = {
+            "Arctic Monkeys": "7Ln80lUS6He07XvHI8qqHH",
+            "Hozier": "2FXC3k01G6Gw61bmprjgqS",
+            "Joyner Lucas": "6C1ohJrd5VydigQtaGy5Wa",
+            "Tash Sultana": "6zVFRTB0Y1whWyH7ZNmywf",
+            "YUNGBLUD": "6Ad91Jof8Niiw0lGLLi3NW",
+        }
 
     def _check_if_podcast(self, track):
         """ Checks if the track is a podcast
@@ -294,7 +302,9 @@ class Listener():
         id = track["item"]["artists"][0]["id"]
         if id is None:
             info = self._get_info(track)
-            return info["artist_name"]
+            if info["artist_name"] in self.id_map:
+                return self.id_map[info["artist_name"]]
+            return hashlib.sha256(bytearray(f"{info['artist_name']}", 'utf-8')).hexdigest()
         return id
 
     def _get_info(self, track, track_duration=0):
@@ -395,7 +405,7 @@ class Listener():
         id = track["item"]["id"]
         if id is None:
             info = self._get_info(track)
-            return f"{info['song_name']}_{info['artist_name']}"
+            return hashlib.sha256(bytearray(f"{info['song_name']}_{info['artist_name']}", 'utf-8')).hexdigest()
         return id
 
     def _init_spotify(self):
@@ -414,7 +424,7 @@ class Listener():
         
         Parameters
         ----------
-        id : str - the id of the last currently playing song
+        id : str - the id of the last played song
 
         Returns
         -------
@@ -442,8 +452,8 @@ class Listener():
         None
         
         """
-        if track_id != self.last_current_update_id:
-            self.last_current_update_id = track_id
+        if track_id != self.last_update_id:
+            self.last_update_id = track_id
             track_details = self._get_track_details(track_id, track)
             track_details["track_id"] = track_id
             self.firebase.update_current(track_details)
@@ -462,8 +472,8 @@ class Listener():
         
         gmail = Gmail()
         gmail.send_message("Starting Listen")
-        last_current = self.spotify.current_user_playing_track()
-        last_current_id = self._get_track_id(last_current)
+        last_track = self.spotify.current_user_playing_track()
+        last_id = self._get_track_id(last_track)
 
         while True:
             try:
@@ -480,27 +490,27 @@ class Listener():
 
                 # Save info if current changed
                 last_info = None
-                if current_id != last_current_id and last_current["currently_playing_type"] == "track":
-                    track_duration = self._get_track_duration(last_current_id)
-                    last_info = self._get_info(last_current, track_duration=track_duration)
+                if current_id != last_id and (last_track["currently_playing_type"] == "track" or last_track["currently_playing_type"] is None):
+                    track_duration = self._get_track_duration(last_id)
+                    last_info = self._get_info(last_track, track_duration=track_duration)
 
                 # Add info to json (if any)
-                should_release = self._should_release(last_current_id) if last_info is not None else False
+                should_release = self._should_release(last_id) if last_info is not None else False
                 if should_release:
-                    artist_id = self._get_artist_id(last_current)
+                    artist_id = self._get_artist_id(last_track)
                     try:
-                        self.firebase.add_song(last_current_id, artist_id, last_info)
+                        self.firebase.add_song(last_id, artist_id, last_info)
                     except ServiceUnavailable as e:
                         print("Reinitializing Firebase")
                         self.firebase = FireManager()
                         time.sleep(5)
-                        self.firebase.add_song(last_current_id, artist_id, last_info)
+                        self.firebase.add_song(last_id, artist_id, last_info)
        
                 self._update_current(current_id, current_track)
 
-                # Update last
-                last_current_id = current_id
-                last_current = current_track
+                # Update last_track
+                last_id = current_id
+                last_track = current_track
 
                 # Wait 10 seconds
                 time.sleep(10)
