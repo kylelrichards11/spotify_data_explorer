@@ -2,25 +2,6 @@
     <h1 id="header" class="mat-display-1">{{artist_name}}</h1>
     <h1 id="header_info" class="mat-display-2">{{listen_count}} listens for {{listen_time}} {{listen_time_unit}}</h1>
     <h1 id="header_info" class="mat-display-2">{{unique_songs}} unique songs</h1>
-    <div id="inputs">
-        <form class="input_form" (ngSubmit)="submit_song()" novalidate>
-            <mat-form-field class="full_width">
-                <mat-label>Song</mat-label>
-                <input name="a_input" id="song_input" type="text" matInput [formControl]="song_control"
-                    [matAutocomplete]="auto">
-                <mat-autocomplete #auto="matAutocomplete" [displayWith]="song_display_fn" (optionSelected)="select_song($event)">
-                    <mat-option *ngFor="let option of song_filtered_options | async" [value]="option">
-                        {{option.song_name}}
-                    </mat-option>
-                </mat-autocomplete>
-            </mat-form-field>
-            <button id="submit_button" submit mat-button>Submit</button>
-        </form>
-    </div>
-    <div>
-        <p class="info_line">First song listened to was <a mat-button id="first_song_link" class="song_name">{{first_song_name}}</a> on {{first_song_date}}</p>
-        <p class="info_line">Last song listened to was <a mat-button id="last_song_link" class="song_name">{{last_song_name}}</a> on {{last_song_date}}</p>
-    </div>
     <div id="graph">
         <canvas id="canvas"></canvas>
     </div>
@@ -38,4 +19,28 @@
     </div>
     <br>
     <br>
+    <div>
+        <p class="info_line">First song listened to was <a mat-button id="first_song_link"
+                class="song_name">{{first_song_name}}</a> on {{first_song_date}}</p>
+        <p class="info_line">Last song listened to was <a mat-button id="last_song_link"
+                class="song_name">{{last_song_name}}</a> on {{last_song_date}}</p>
+        <p class="info_line">Most played by play count is <a mat-button id="most_pc_link" class="song_name">{{most_pc_song}}</a> with {{most_pc}} plays</p> 
+        <p class="info_line">Most played by time is <a mat-button id="most_time_link" class="song_name">{{most_time_song}}</a> with {{most_time}} played</p> 
+    </div>
+    <div id="inputs">
+        <form class="input_form" (ngSubmit)="submit_song()" novalidate>
+            <mat-form-field class="full_width">
+                <mat-label>Song</mat-label>
+                <input name="a_input" id="song_input" type="text" matInput [formControl]="song_control"
+                    [matAutocomplete]="auto">
+                <mat-autocomplete #auto="matAutocomplete" [displayWith]="song_display_fn"
+                    (optionSelected)="select_song($event)">
+                    <mat-option *ngFor="let option of song_filtered_options | async" [value]="option">
+                        {{option.song_name}}
+                    </mat-option>
+                </mat-autocomplete>
+            </mat-form-field>
+            <button id="submit_button" submit mat-button>Submit</button>
+        </form>
+    </div>
 </div>

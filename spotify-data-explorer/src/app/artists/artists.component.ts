@@ -40,6 +40,10 @@ export class ArtistsComponent implements OnInit {
     first_song_date;
     last_song_name;
     last_song_date;
+    most_pc_song;
+    most_pc;
+    most_time_song;
+    most_time;
 
     /* SONG LIST VARIABLES */
     song_control = new FormControl();
@@ -228,8 +232,7 @@ export class ArtistsComponent implements OnInit {
     }
 
     update_track(track) {
-        this.tracks[track["track_id"]] = {}
-        this.tracks[track["track_id"]]["listens"] = track["listens"]
+        this.tracks[track["track_id"]] = track
         this.recount_stats()
     }
 
@@ -254,6 +257,30 @@ export class ArtistsComponent implements OnInit {
         var month_counts = this.init_dict("month", 0)
         var month_times = this.init_dict("month", 0)
         var month_unique_songs = this.init_dict("month", "set")
+
+        // Most played
+        var highest_pc = 0;
+        var highest_pc_song;
+        var highest_time = 0;
+        var highest_time_song;
+        for (let track_id in this.tracks) {
+            let pc = this.tracks[track_id]["listen_count"]
+            let play_time = this.tracks[track_id]["listen_time"]
+            let song_name = this.tracks[track_id]["song_name"]
+            if(pc > highest_pc) {
+                highest_pc = pc;
+                highest_pc_song = song_name;
+            }
+            if(play_time > highest_time) {
+                highest_time = play_time;
+                highest_time_song = song_name
+            }
+        }
+        this.most_pc_song = highest_pc_song
+        this.most_pc = highest_pc
+        this.most_time_song = highest_time_song
+        let most_time_info = this.transform_time(highest_time)
+        this.most_time = most_time_info[0] + " " + most_time_info[1]
 
         for (let track_id in this.tracks) {
             for (let listen_idx in this.tracks[track_id]["listens"]) {
