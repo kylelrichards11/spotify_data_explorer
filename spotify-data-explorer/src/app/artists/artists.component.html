@@ -1,29 +1,29 @@
 <div class="paper">
     <h1 id="header" class="mat-display-1">{{artist_name}}</h1>
-    <h1 id="header_info" class="mat-display-2">{{listen_count}} listens for {{listen_time}} {{listen_time_unit}}</h1>
+    <h1 id="header_info" class="mat-display-2">{{artist_listen_count}} listens for {{artist_listen_time}} {{artist_listen_time_unit}}</h1>
     <h1 id="header_info" class="mat-display-2">{{unique_songs}} unique songs</h1>
     <div id="graph">
-        <canvas id="canvas"></canvas>
+        <canvas id="artist_canvas"></canvas>
     </div>
     <br>
     <div id="buttons">
         <mat-button-toggle-group id='timescale' value="months">
-            <mat-button-toggle value="months" (click)="change_timescale('month')">Month</mat-button-toggle>
-            <mat-button-toggle value="years" (click)="change_timescale('year')">Year</mat-button-toggle>
+            <mat-button-toggle value="months" (click)="change_artist_timescale('month')">Month</mat-button-toggle>
+            <mat-button-toggle value="years" (click)="change_artist_timescale('year')">Year</mat-button-toggle>
         </mat-button-toggle-group>
         <mat-button-toggle-group id='stat' value="listens">
-            <mat-button-toggle value="listens" (click)="change_stat('counts')">Listens</mat-button-toggle>
-            <mat-button-toggle value="time" (click)="change_stat('times')">Time</mat-button-toggle>
-            <mat-button-toggle value="uq_songs" (click)="change_stat('uq_songs')">Unique Songs</mat-button-toggle>
+            <mat-button-toggle value="listens" (click)="change_artist_stat('counts')">Listens</mat-button-toggle>
+            <mat-button-toggle value="time" (click)="change_artist_stat('times')">Time</mat-button-toggle>
+            <mat-button-toggle value="uq_songs" (click)="change_artist_stat('uq_songs')">Unique Songs</mat-button-toggle>
         </mat-button-toggle-group>
     </div>
     <br>
     <br>
     <div>
         <p class="info_line">First song listened to was <a mat-button id="first_song_link"
-                class="song_name">{{first_song_name}}</a> on {{first_song_date}}</p>
+                class="song_name">{{artist_first_song_name}}</a> on {{artist_first_song_date}}</p>
         <p class="info_line">Last song listened to was <a mat-button id="last_song_link"
-                class="song_name">{{last_song_name}}</a> on {{last_song_date}}</p>
+                class="song_name">{{artist_last_song_name}}</a> on {{artist_last_song_date}}</p>
         <p class="info_line">Most played by play count is <a mat-button id="most_pc_link" class="song_name">{{most_pc_song}}</a> with {{most_pc}} plays</p> 
         <p class="info_line">Most played by time is <a mat-button id="most_time_link" class="song_name">{{most_time_song}}</a> with {{most_time}} played</p> 
     </div>
@@ -40,7 +40,27 @@
                     </mat-option>
                 </mat-autocomplete>
             </mat-form-field>
-            <button id="submit_button" submit mat-button>Submit</button>
         </form>
     </div>
+    <div>
+        <p class="info_line">{{song_listen_count}} listens for {{song_listen_time}} {{song_listen_time_unit}}</p>
+        <p class="info_line">First listen was on {{song_first_song_date}}</p>
+        <p class="info_line">Last listen was on {{song_last_song_date}}</p>
+    </div>
+    <div id="graph">
+        <canvas id="song_canvas"></canvas>
+    </div>
+    <br>
+    <div id="buttons">
+        <mat-button-toggle-group id='timescale' value="months">
+            <mat-button-toggle value="months" (click)="change_song_timescale('month')">Month</mat-button-toggle>
+            <mat-button-toggle value="years" (click)="change_song_timescale('year')">Year</mat-button-toggle>
+        </mat-button-toggle-group>
+        <mat-button-toggle-group id='stat' value="listens">
+            <mat-button-toggle value="listens" (click)="change_song_stat('counts')">Listens</mat-button-toggle>
+            <mat-button-toggle value="time" (click)="change_song_stat('times')">Time</mat-button-toggle>
+        </mat-button-toggle-group>
+    </div>
+    <br>
+    <br>
 </div>

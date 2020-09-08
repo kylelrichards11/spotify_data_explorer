@@ -32,32 +32,53 @@ export class ArtistsComponent implements OnInit {
     artist_name: string;
     artist_doc;
     artist_item;
-    listen_count;
-    listen_time;
-    listen_time_unit;
+    artist_listen_count;
+    artist_listen_time;
+    artist_listen_time_unit;
     unique_songs;
-    first_song_name;
-    first_song_date;
-    last_song_name;
-    last_song_date;
+    artist_first_song_name;
+    artist_first_song_date;
+    artist_last_song_name;
+    artist_last_song_date;
     most_pc_song;
     most_pc;
     most_time_song;
     most_time;
+    song_listen_count;
+    song_listen_time;
+    song_listen_time_unit;
+    song_first_song_date;
+    song_last_song_date;
 
     /* SONG LIST VARIABLES */
     song_control = new FormControl();
     song_options: SongListItem[];
     song_filtered_options: Observable<SongListItem[]>;
-    selected_song;
 
     /* GRAPH VARIABLES */
-    graph;
+    artist_graph;
+    song_graph;
     tracks = {};
-    active_dataset_time = "month";
-    active_dataset_stat = "counts";
-    active_time_unit;
-    datasets = {
+    active_artist_dataset_time = "month";
+    active_artist_dataset_stat = "counts";
+    active_artist_time_unit;
+    artist_datasets = {
+        "year" : {
+            "counts": [],
+            "times": [],
+            "uq_songs": []
+        },
+        "month" : {
+            "counts": [],
+            "times": [],
+            "uq_songs": []
+        }
+    }
+
+    active_song_dataset_time = "month";
+    active_song_dataset_stat = "counts";
+    active_song_time_unit;
+    song_datasets = {
         "year" : {
             "counts": [],
             "times": [],
@@ -114,9 +135,63 @@ export class ArtistsComponent implements OnInit {
         this.artist_item = this.artist_doc.valueChanges();
         this.artist_item.subscribe(val => this.populate_info(val))
 
-        let canvas = <HTMLCanvasElement>document.getElementById('canvas');
-        let context = canvas.getContext('2d');
-        this.graph = new Chart(context, {
+        // Define artist graph
+        let artist_canvas = <HTMLCanvasElement>document.getElementById('artist_canvas');
+        let artist_context = artist_canvas.getContext('2d');
+        this.artist_graph = new Chart(artist_context, {
+            "type": "bar",
+            "data": {
+                "datasets": [{
+                    data: [0, 0, 0, 0, 0, 0],
+                    backgroundColor: '#08a1d4'
+                }],
+                "labels": this.labels["month"]
+            },
+            "options": {
+                maintainAspectRatio: false,
+                responsive: true,
+                scales : {
+                    xAxes: [{
+                        ticks: {
+                            fontColor: "black"
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Year",
+                            fontColor: "black",
+                            fontSize: 16
+                        }
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            fontColor: "black"
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Listens",
+                            fontColor: "black",
+                            fontSize: 16
+                        }
+                    }]
+                },
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: "Listens per Month",
+                    fontSize: 18,
+                    fontFamily: "Arial",
+                    fontColor: "black",
+                },
+            }
+        });
+
+        // Define song graph
+        let song_canvas = <HTMLCanvasElement>document.getElementById('song_canvas');
+        let song_context = song_canvas.getContext('2d');
+        this.song_graph = new Chart(song_context, {
             "type": "bar",
             "data": {
                 "datasets": [{
@@ -192,43 +267,123 @@ export class ArtistsComponent implements OnInit {
     }
 
     select_song(event) {
-        this.selected_song = event.option.value;
-    }
-
-    submit_song() {
-        this.router.navigateByUrl('/song/' + this.selected_song.track_id)
+        this.set_song_chart_data(this.tracks[event.option.value.track_id])
     }
 
     /* INFO AND GRAPH FUNCTIONS */
-
     populate_info(val) {
         this.artist_name = val["artist_name"]
-        this.listen_count = val["listen_count"]
+        this.artist_listen_count = val["listen_count"]
         let time_info = this.transform_time(val["listen_time"]);
-        this.listen_time = time_info[0]
-        this.listen_time_unit = time_info[1].toLowerCase()
+        this.artist_listen_time = time_info[0]
+        this.artist_listen_time_unit = time_info[1].toLowerCase()
         this.unique_songs = val["tracks"].length;
         
         (<HTMLAnchorElement>document.getElementById("first_song_link")).href = '/song/' + val["first_listen"]["track_id"]
-        this.first_song_name = val["first_listen"]["song_name"]
+        this.artist_first_song_name = val["first_listen"]["song_name"]
         let flt = val["first_listen_time"]
-        this.first_song_date = MONTHS[flt["month"] - 1] + " " + flt["day"] + ", " + flt["year"];
+        this.artist_first_song_date = MONTHS[flt["month"] - 1] + " " + flt["day"] + ", " + flt["year"];
 
         (<HTMLAnchorElement>document.getElementById("last_song_link")).href = '/song/' + val["last_listen"]["track_id"]
-        this.last_song_name = val["last_listen"]["song_name"]
+        this.artist_last_song_name = val["last_listen"]["song_name"]
         let llt = val["last_listen_time"]
-        this.last_song_date = MONTHS[llt["month"] - 1] + " " + llt["day"] + ", " + llt["year"]
+        this.artist_last_song_date = MONTHS[llt["month"] - 1] + " " + llt["day"] + ", " + llt["year"]
         
-        this.set_chart_data(val["tracks"])
+        this.set_artist_chart_data(val["tracks"])
         this.update_song_options(val);
     }
 
-    set_chart_data(tracks) {
+    set_artist_chart_data(tracks) {
         tracks.forEach(track => {
             let track_doc = this.afs.doc<Item>('songs/' + track["track_id"]);
             let track_item = track_doc.valueChanges();
             track_item.subscribe(val => this.update_track(val))
         });
+    }
+
+    set_song_chart_data(track_info) {
+        // Populate info
+        this.song_listen_count = track_info["listen_count"]
+        let song_time_info = this.transform_time(track_info["listen_time"])
+        this.song_listen_time = song_time_info[0]
+        this.song_listen_time_unit = song_time_info[1]
+        let fl = track_info["first_listen"]
+        let ll = track_info["last_listen"]
+        this.song_first_song_date = MONTHS[fl["month"] - 1] + " " + fl["day"] + ", " + fl["year"];
+        this.song_last_song_date = MONTHS[ll["month"] - 1] + " " + ll["day"] + ", " + ll["year"];
+
+        var year_counts = this.init_dict("year", 0)
+        var year_times = this.init_dict("year", 0)
+        var month_counts = this.init_dict("month", 0)
+        var month_times = this.init_dict("month", 0)
+        for (let listen_idx in track_info["listens"]) {
+            let listen_year = track_info["listens"][listen_idx]["year"]
+            let listen_month = track_info["listens"][listen_idx]["month"] + "/" + listen_year;
+            let ms_played = track_info["listens"][listen_idx]["duration"]
+            year_counts[listen_year] += 1;
+            year_times[listen_year] += ms_played
+            month_counts[listen_month] += 1;
+            month_times[listen_month] += ms_played;
+        }
+        
+        // Calculate year values
+        var year_count_data = []
+        var year_time_data = []
+
+        var max_year_time = -1;
+        var max_year;
+        for (let year in year_times) {
+            let year_time = year_times[year]
+            if(year_time > max_year_time) {
+                max_year_time = year_time;
+                max_year = year;
+            }
+        }
+        let year_unit = this.transform_time(max_year_time)[1];
+        if(this.active_song_dataset_time == "year") {
+            this.active_song_time_unit = year_unit;
+        }
+
+        for (let year in year_counts) {
+            year_count_data.push(year_counts[year])    
+        }
+        for (let year in year_times) {
+            year_time_data.push(this.transform_time_unit(year_times[year], year_unit))
+        }
+
+        this.song_datasets["year"]["counts"] = year_count_data;
+        this.song_datasets["year"]["times"] = year_time_data;
+
+        // Calculate month values
+        var month_count_data = []
+        var month_time_data = []
+
+        var max_month_time = -1;
+        var max_month;
+        for (let month in month_times) {
+            let month_time = month_times[month]
+            if(month_time > max_month_time) {
+                max_month_time = month_time;
+                max_month = month;
+            }
+        }
+        let month_unit = this.transform_time(max_month_time)[1];
+        if(this.active_song_dataset_time == "month") {
+            this.active_song_time_unit = month_unit;
+        }
+
+        for (let month in month_counts) {
+            month_count_data.push(month_counts[month])    
+        }
+        for (let month in month_times) {
+            month_time_data.push(this.transform_time_unit(month_times[month], month_unit))
+        }
+
+        this.song_datasets["month"]["counts"] = month_count_data;
+        this.song_datasets["month"]["times"] = month_time_data;
+
+        this.song_graph["data"]["datasets"][0]["data"] = this.song_datasets[this.active_song_dataset_time][this.active_song_dataset_stat]
+        this.song_graph.update()
     }
 
     update_track(track) {
@@ -310,8 +465,8 @@ export class ArtistsComponent implements OnInit {
             }
         }
         let year_unit = this.transform_time(max_year_time)[1];
-        if(this.active_dataset_time == "year") {
-            this.active_time_unit = year_unit;
+        if(this.active_artist_dataset_time == "year") {
+            this.active_artist_time_unit = year_unit;
         }
 
         for (let year in year_counts) {
@@ -324,9 +479,9 @@ export class ArtistsComponent implements OnInit {
             year_unique_songs_data.push(year_unique_songs[year].size)
         }
 
-        this.datasets["year"]["counts"] = year_count_data;
-        this.datasets["year"]["times"] = year_time_data;
-        this.datasets["year"]["uq_songs"] = year_unique_songs_data;
+        this.artist_datasets["year"]["counts"] = year_count_data;
+        this.artist_datasets["year"]["times"] = year_time_data;
+        this.artist_datasets["year"]["uq_songs"] = year_unique_songs_data;
 
         // MONTHS
         var month_count_data = []
@@ -343,8 +498,8 @@ export class ArtistsComponent implements OnInit {
             }
         }
         let month_unit = this.transform_time(max_month_time)[1];
-        if(this.active_dataset_time == "month") {
-            this.active_time_unit = month_unit;
+        if(this.active_artist_dataset_time == "month") {
+            this.active_artist_time_unit = month_unit;
         }
 
         for (let month in month_counts) {
@@ -357,12 +512,12 @@ export class ArtistsComponent implements OnInit {
             month_unique_songs_data.push(month_unique_songs[month].size)
         }
 
-        this.datasets["month"]["counts"] = month_count_data;
-        this.datasets["month"]["times"] = month_time_data;
-        this.datasets["month"]["uq_songs"] = month_unique_songs_data;
+        this.artist_datasets["month"]["counts"] = month_count_data;
+        this.artist_datasets["month"]["times"] = month_time_data;
+        this.artist_datasets["month"]["uq_songs"] = month_unique_songs_data;
 
-        this.graph["data"]["datasets"][0]["data"] = this.datasets[this.active_dataset_time][this.active_dataset_stat]
-        this.graph.update()
+        this.artist_graph["data"]["datasets"][0]["data"] = this.artist_datasets[this.active_artist_dataset_time][this.active_artist_dataset_stat]
+        this.artist_graph.update()
     }
 
     transform_time(listen_time) {
@@ -390,35 +545,68 @@ export class ArtistsComponent implements OnInit {
         return listen_time.toFixed(2)
     }
 
-    change_timescale(timescale) {
-        this.active_dataset_time = timescale;
-        this.graph["data"]["labels"] = this.labels[timescale]
-        this.graph["data"]["datasets"][0]["data"] = this.datasets[timescale][this.active_dataset_stat]
-        this.graph["options"]["scales"]["xAxes"][0]["scaleLabel"]["labelString"] = this.xlabels[timescale]
-        if(this.active_dataset_stat == "times") {
-            this.graph["options"]["title"]["text"] = this.active_time_unit + this.titles[this.active_dataset_stat][timescale]
+    // Chart Button Functions
+    change_artist_timescale(timescale) {
+        this.active_artist_dataset_time = timescale;
+        this.artist_graph["data"]["labels"] = this.labels[timescale]
+        this.artist_graph["data"]["datasets"][0]["data"] = this.artist_datasets[timescale][this.active_artist_dataset_stat]
+        this.artist_graph["options"]["scales"]["xAxes"][0]["scaleLabel"]["labelString"] = this.xlabels[timescale]
+        if(this.active_artist_dataset_stat == "times") {
+            this.artist_graph["options"]["title"]["text"] = this.active_artist_time_unit + this.titles[this.active_artist_dataset_stat][timescale]
         }
         else {
-            this.graph["options"]["title"]["text"] = this.titles[this.active_dataset_stat][timescale]
+            this.artist_graph["options"]["title"]["text"] = this.titles[this.active_artist_dataset_stat][timescale]
         }
-        this.graph.update()
+        this.artist_graph.update()
     }
 
-    change_stat(stat) {
-        this.active_dataset_stat = stat;
-        this.graph["data"]["datasets"][0]["data"] = this.datasets[this.active_dataset_time][stat]
+    change_artist_stat(stat) {
+        this.active_artist_dataset_stat = stat;
+        this.artist_graph["data"]["datasets"][0]["data"] = this.artist_datasets[this.active_artist_dataset_time][stat]
         if(stat == "times") {
-            this.graph["options"]["scales"]["yAxes"][0]["scaleLabel"]["labelString"] = this.active_time_unit
+            this.artist_graph["options"]["scales"]["yAxes"][0]["scaleLabel"]["labelString"] = this.active_artist_time_unit
         }
         else {
-            this.graph["options"]["scales"]["yAxes"][0]["scaleLabel"]["labelString"] = this.ylabels[stat]
+            this.artist_graph["options"]["scales"]["yAxes"][0]["scaleLabel"]["labelString"] = this.ylabels[stat]
         }
         if(stat == "times") {
-            this.graph["options"]["title"]["text"] = this.active_time_unit + this.titles[stat][this.active_dataset_time]
+            this.artist_graph["options"]["title"]["text"] = this.active_artist_time_unit + this.titles[stat][this.active_artist_dataset_time]
         }
         else {
-            this.graph["options"]["title"]["text"] = this.titles[stat][this.active_dataset_time]
+            this.artist_graph["options"]["title"]["text"] = this.titles[stat][this.active_artist_dataset_time]
         }
-        this.graph.update()
+        this.artist_graph.update()
+    }
+
+    change_song_timescale(timescale) {
+        this.active_song_dataset_time = timescale;
+        this.song_graph["data"]["labels"] = this.labels[timescale]
+        this.song_graph["data"]["datasets"][0]["data"] = this.song_datasets[timescale][this.active_song_dataset_stat]
+        this.song_graph["options"]["scales"]["xAxes"][0]["scaleLabel"]["labelString"] = this.xlabels[timescale]
+        if(this.active_song_dataset_stat == "times") {
+            this.song_graph["options"]["title"]["text"] = this.active_song_time_unit + this.titles[this.active_song_dataset_stat][timescale]
+        }
+        else {
+            this.song_graph["options"]["title"]["text"] = this.titles[this.active_song_dataset_stat][timescale]
+        }
+        this.song_graph.update()
+    }
+
+    change_song_stat(stat) {
+        this.active_song_dataset_stat = stat;
+        this.song_graph["data"]["datasets"][0]["data"] = this.song_datasets[this.active_song_dataset_time][stat]
+        if(stat == "times") {
+            this.song_graph["options"]["scales"]["yAxes"][0]["scaleLabel"]["labelString"] = this.active_song_time_unit
+        }
+        else {
+            this.song_graph["options"]["scales"]["yAxes"][0]["scaleLabel"]["labelString"] = "Listens"
+        }
+        if(stat == "times") {
+            this.song_graph["options"]["title"]["text"] = this.active_song_time_unit + this.titles[stat][this.active_song_dataset_time]
+        }
+        else {
+            this.song_graph["options"]["title"]["text"] = this.titles[stat][this.active_song_dataset_time]
+        }
+        this.song_graph.update()
     }
 }
