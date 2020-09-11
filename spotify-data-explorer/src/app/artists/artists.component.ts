@@ -61,7 +61,10 @@ export class ArtistsComponent implements OnInit {
     tracks = {};
     active_artist_dataset_time = "month";
     active_artist_dataset_stat = "counts";
-    active_artist_time_unit;
+    active_artist_time_unit = {
+        "month":"",
+        "year":""
+    }
     artist_datasets = {
         "year" : {
             "counts": [],
@@ -77,7 +80,10 @@ export class ArtistsComponent implements OnInit {
 
     active_song_dataset_time = "month";
     active_song_dataset_stat = "counts";
-    active_song_time_unit;
+    active_song_time_unit = {
+        "month":"",
+        "year":""
+    }
     song_datasets = {
         "year" : {
             "counts": [],
@@ -340,9 +346,7 @@ export class ArtistsComponent implements OnInit {
             }
         }
         let year_unit = this.transform_time(max_year_time)[1];
-        if(this.active_song_dataset_time == "year") {
-            this.active_song_time_unit = year_unit;
-        }
+        this.active_song_time_unit["year"] = year_unit;
 
         for (let year in year_counts) {
             year_count_data.push(year_counts[year])    
@@ -368,9 +372,7 @@ export class ArtistsComponent implements OnInit {
             }
         }
         let month_unit = this.transform_time(max_month_time)[1];
-        if(this.active_song_dataset_time == "month") {
-            this.active_song_time_unit = month_unit;
-        }
+        this.active_song_time_unit["month"] = month_unit;
 
         for (let month in month_counts) {
             month_count_data.push(month_counts[month])    
@@ -465,9 +467,7 @@ export class ArtistsComponent implements OnInit {
             }
         }
         let year_unit = this.transform_time(max_year_time)[1];
-        if(this.active_artist_dataset_time == "year") {
-            this.active_artist_time_unit = year_unit;
-        }
+        this.active_artist_time_unit["year"] = year_unit;
 
         for (let year in year_counts) {
             year_count_data.push(year_counts[year])    
@@ -498,9 +498,7 @@ export class ArtistsComponent implements OnInit {
             }
         }
         let month_unit = this.transform_time(max_month_time)[1];
-        if(this.active_artist_dataset_time == "month") {
-            this.active_artist_time_unit = month_unit;
-        }
+        this.active_artist_time_unit["month"] = month_unit;
 
         for (let month in month_counts) {
             month_count_data.push(month_counts[month])    
@@ -552,10 +550,13 @@ export class ArtistsComponent implements OnInit {
         this.artist_graph["data"]["datasets"][0]["data"] = this.artist_datasets[timescale][this.active_artist_dataset_stat]
         this.artist_graph["options"]["scales"]["xAxes"][0]["scaleLabel"]["labelString"] = this.xlabels[timescale]
         if(this.active_artist_dataset_stat == "times") {
-            this.artist_graph["options"]["title"]["text"] = this.active_artist_time_unit + this.titles[this.active_artist_dataset_stat][timescale]
+            this.artist_graph["options"]["title"]["text"] = this.active_artist_time_unit[timescale] + this.titles[this.active_artist_dataset_stat][timescale]
         }
         else {
             this.artist_graph["options"]["title"]["text"] = this.titles[this.active_artist_dataset_stat][timescale]
+        }
+        if(this.active_artist_dataset_stat == "times") {
+            this.artist_graph["options"]["scales"]["yAxes"][0]["scaleLabel"]["labelString"] = this.active_artist_time_unit[timescale]
         }
         this.artist_graph.update()
     }
@@ -564,13 +565,13 @@ export class ArtistsComponent implements OnInit {
         this.active_artist_dataset_stat = stat;
         this.artist_graph["data"]["datasets"][0]["data"] = this.artist_datasets[this.active_artist_dataset_time][stat]
         if(stat == "times") {
-            this.artist_graph["options"]["scales"]["yAxes"][0]["scaleLabel"]["labelString"] = this.active_artist_time_unit
+            this.artist_graph["options"]["scales"]["yAxes"][0]["scaleLabel"]["labelString"] = this.active_artist_time_unit[this.active_artist_dataset_time]
         }
         else {
             this.artist_graph["options"]["scales"]["yAxes"][0]["scaleLabel"]["labelString"] = this.ylabels[stat]
         }
         if(stat == "times") {
-            this.artist_graph["options"]["title"]["text"] = this.active_artist_time_unit + this.titles[stat][this.active_artist_dataset_time]
+            this.artist_graph["options"]["title"]["text"] = this.active_artist_time_unit[this.active_artist_dataset_time] + this.titles[stat][this.active_artist_dataset_time]
         }
         else {
             this.artist_graph["options"]["title"]["text"] = this.titles[stat][this.active_artist_dataset_time]
@@ -584,10 +585,13 @@ export class ArtistsComponent implements OnInit {
         this.song_graph["data"]["datasets"][0]["data"] = this.song_datasets[timescale][this.active_song_dataset_stat]
         this.song_graph["options"]["scales"]["xAxes"][0]["scaleLabel"]["labelString"] = this.xlabels[timescale]
         if(this.active_song_dataset_stat == "times") {
-            this.song_graph["options"]["title"]["text"] = this.active_song_time_unit + this.titles[this.active_song_dataset_stat][timescale]
+            this.song_graph["options"]["title"]["text"] = this.active_song_time_unit[timescale] + this.titles[this.active_song_dataset_stat][timescale]
         }
         else {
             this.song_graph["options"]["title"]["text"] = this.titles[this.active_song_dataset_stat][timescale]
+        }
+        if(this.active_song_dataset_stat == "times") {
+            this.song_graph["options"]["scales"]["yAxes"][0]["scaleLabel"]["labelString"] = this.active_song_time_unit[timescale]
         }
         this.song_graph.update()
     }
@@ -596,13 +600,13 @@ export class ArtistsComponent implements OnInit {
         this.active_song_dataset_stat = stat;
         this.song_graph["data"]["datasets"][0]["data"] = this.song_datasets[this.active_song_dataset_time][stat]
         if(stat == "times") {
-            this.song_graph["options"]["scales"]["yAxes"][0]["scaleLabel"]["labelString"] = this.active_song_time_unit
+            this.song_graph["options"]["scales"]["yAxes"][0]["scaleLabel"]["labelString"] = this.active_song_time_unit[this.active_song_dataset_time]
         }
         else {
             this.song_graph["options"]["scales"]["yAxes"][0]["scaleLabel"]["labelString"] = "Listens"
         }
         if(stat == "times") {
-            this.song_graph["options"]["title"]["text"] = this.active_song_time_unit + this.titles[stat][this.active_song_dataset_time]
+            this.song_graph["options"]["title"]["text"] = this.active_song_time_unit[this.active_song_dataset_time] + this.titles[stat][this.active_song_dataset_time]
         }
         else {
             this.song_graph["options"]["title"]["text"] = this.titles[stat][this.active_song_dataset_time]

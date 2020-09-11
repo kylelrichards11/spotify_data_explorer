@@ -28,7 +28,7 @@
         <p class="info_line">Most played by time is <a mat-button id="most_time_link" class="song_name">{{most_time_song}}</a> with {{most_time}} played</p> 
     </div>
     <div id="inputs">
-        <form class="input_form" (ngSubmit)="submit_song()" novalidate>
+        <form class="input_form" novalidate>
             <mat-form-field class="full_width">
                 <mat-label>Song</mat-label>
                 <input name="a_input" id="song_input" type="text" matInput [formControl]="song_control"

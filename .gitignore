@@ -8,3 +8,6 @@ venv/
 api_vars.sh
 *.pickle
 credentials.json
+environment.ts
+environment.prod.ts
+.firebase
