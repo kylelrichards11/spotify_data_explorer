@@ -163,7 +163,7 @@ export class ArtistsComponent implements OnInit {
                         },
                         scaleLabel: {
                             display: true,
-                            labelString: "Year",
+                            labelString: "Month",
                             fontColor: "black",
                             fontSize: 16
                         }
@@ -216,7 +216,7 @@ export class ArtistsComponent implements OnInit {
                         },
                         scaleLabel: {
                             display: true,
-                            labelString: "Year",
+                            labelString: "Month",
                             fontColor: "black",
                             fontSize: 16
                         }
@@ -536,9 +536,9 @@ export class ArtistsComponent implements OnInit {
         listen_time = listen_time / 60000
         if (unit == "Hours") {
             listen_time = listen_time / 60
-            if (unit == "Days") {
-                listen_time = listen_time / 24
-            }
+        }
+        else if (unit == "Days") {
+            listen_time = listen_time / (60 * 24)
         }
         return listen_time.toFixed(2)
     }
