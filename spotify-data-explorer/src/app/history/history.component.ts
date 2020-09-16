@@ -23,10 +23,10 @@ export interface SongListItem {
   export class HistoryComponent implements OnInit {
 
     afs: AngularFirestore;
+    history_docs = {};
+    history_items = {};
 
     /* INFO VARIABLES */
-    history_doc;
-    history_item;
     all_listen_count;
     all_listen_time;
     all_listen_time_unit;
@@ -37,7 +37,10 @@ export interface SongListItem {
     graph;
     active_dataset_time = "month";
     active_dataset_stat = "counts";
-    active_time_unit;
+    active_time_unit = {
+        "month":"",
+        "year":""
+    }
     datasets = {
         "year" : {
             "counts": [],
@@ -94,9 +97,11 @@ export interface SongListItem {
 
     ngOnInit() {
         // Subscribe to history
-        this.history_doc = this.afs.doc<Item>('utils/history');
-        this.history_item = this.history_doc.valueChanges();
-        this.history_item.subscribe(val => this.populate_info(val))
+        for(let year in YEAR_EMPTY) {
+            const year_doc = this.afs.doc<Item>('history/' + year)
+            this.history_items[year] = year_doc.valueChanges()
+            this.history_items[year].subscribe(val => this.year_subscribe(val, year))
+        }
 
         // Init graph
         let canvas = <HTMLCanvasElement>document.getElementById('canvas');
@@ -120,7 +125,7 @@ export interface SongListItem {
                         },
                         scaleLabel: {
                             display: true,
-                            labelString: "Year",
+                            labelString: "Month",
                             fontColor: "black",
                             fontSize: 16
                         }
@@ -152,8 +157,15 @@ export interface SongListItem {
         });
     }
 
+    year_subscribe(val, year) {
+        this.history_docs[year] = val
+        this.populate_info()
+        this.set_chart_data()
+    }
+
     // Fill in stats about the history
-    populate_info(val) {
+    populate_info() {
+        const val = this.history_docs
         var all_listen_count = 0;
         var all_listen_time = 0;
         var all_unique_artists = new Set();
@@ -162,11 +174,11 @@ export interface SongListItem {
             for(let month in val[year]) {
                 all_listen_count += val[year][month]["listen_count"];
                 all_listen_time += val[year][month]["listen_time"];
-                val[year][month]["uq_artists"].forEach(element => {
-                    all_unique_artists.add(element["artist_id"])
+                val[year][month]["uq_artists"].forEach(artist_id => {
+                    all_unique_artists.add(artist_id)
                 });
-                val[year][month]["uq_songs"].forEach(element => {
-                    all_unique_songs.add(element["track_id"])
+                val[year][month]["uq_songs"].forEach(track_id => {
+                    all_unique_songs.add(track_id)
                 });
             }
         }
@@ -176,11 +188,11 @@ export interface SongListItem {
         this.all_listen_time_unit = transformed_time[1];
         this.all_unique_artists = all_unique_artists.size
         this.all_unique_songs = all_unique_songs.size
-        this.set_chart_data(val)
     }
 
     // Calculate data for graph
-    set_chart_data(val) {
+    set_chart_data() {
+        const val = this.history_docs
         var year_counts = Object.assign({}, YEAR_EMPTY);
         var year_raw_times = Object.assign({}, YEAR_EMPTY);
         var year_unique_artists = Object.assign({}, YEAR_EMPTY);
@@ -202,11 +214,11 @@ export interface SongListItem {
                 month_raw_times[month_id] = val[year][month]["listen_time"];
                 month_unique_artists[month_id] = val[year][month]["uq_artists"].length
                 month_unique_songs[month_id] = val[year][month]["uq_songs"].length
-                val[year][month]["uq_artists"].forEach(artist => {
-                    uq_artists.add(artist["artist_id"])
+                val[year][month]["uq_artists"].forEach(artist_id => {
+                    uq_artists.add(artist_id)
                 });
-                val[year][month]["uq_songs"].forEach(song => {
-                    uq_songs.add(song["track_id"])
+                val[year][month]["uq_songs"].forEach(track_id => {
+                    uq_songs.add(track_id)
                 });
             }
             year_unique_artists[year] = uq_artists.size
@@ -229,9 +241,7 @@ export interface SongListItem {
             }
         }
         let year_unit = this.transform_time(max_year_time)[1];
-        if(this.active_dataset_time == "year") {
-            this.active_time_unit = year_unit;
-        }
+        this.active_time_unit["year"] = year_unit;
 
         for (let year in year_counts) {
             year_count_data.push(year_counts[year])    
@@ -267,9 +277,7 @@ export interface SongListItem {
             }
         }
         let month_unit = this.transform_time(max_month_time)[1];
-        if(this.active_dataset_time == "month") {
-            this.active_time_unit = month_unit;
-        }
+        this.active_time_unit["month"] = month_unit;
 
         for (let month in month_counts) {
             month_count_data.push(month_counts[month])    
@@ -311,20 +319,21 @@ export interface SongListItem {
         listen_time = listen_time / 60000
         if (unit == "Hours") {
             listen_time = listen_time / 60
-            if (unit == "Days") {
-                listen_time = listen_time / 24
-            }
+        }
+        else if (unit == "Days") {
+            listen_time = listen_time / (60 * 24)
         }
         return listen_time.toFixed(2)
     }
 
     change_timescale(timescale) {
         this.active_dataset_time = timescale;
+        console.log(this.datasets["year"]["times"])
         this.graph["data"]["labels"] = this.labels[timescale]
         this.graph["data"]["datasets"][0]["data"] = this.datasets[timescale][this.active_dataset_stat]
         this.graph["options"]["scales"]["xAxes"][0]["scaleLabel"]["labelString"] = this.xlabels[timescale]
         if(this.active_dataset_stat == "times") {
-            this.graph["options"]["title"]["text"] = this.active_time_unit + this.titles[this.active_dataset_stat][timescale]
+            this.graph["options"]["title"]["text"] = this.active_time_unit[timescale] + this.titles[this.active_dataset_stat][timescale]
         }
         else {
             this.graph["options"]["title"]["text"] = this.titles[this.active_dataset_stat][timescale]
@@ -336,13 +345,13 @@ export interface SongListItem {
         this.active_dataset_stat = stat;
         this.graph["data"]["datasets"][0]["data"] = this.datasets[this.active_dataset_time][stat]
         if(stat == "times") {
-            this.graph["options"]["scales"]["yAxes"][0]["scaleLabel"]["labelString"] = this.active_time_unit
+            this.graph["options"]["scales"]["yAxes"][0]["scaleLabel"]["labelString"] = this.active_time_unit[this.active_dataset_time]
         }
         else {
             this.graph["options"]["scales"]["yAxes"][0]["scaleLabel"]["labelString"] = this.ylabels[stat]
         }
         if(stat == "times") {
-            this.graph["options"]["title"]["text"] = this.active_time_unit + this.titles[stat][this.active_dataset_time]
+            this.graph["options"]["title"]["text"] = this.active_time_unit[this.active_dataset_time] + this.titles[stat][this.active_dataset_time]
         }
         else {
             this.graph["options"]["title"]["text"] = this.titles[stat][this.active_dataset_time]
