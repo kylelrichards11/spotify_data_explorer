@@ -10,244 +10,13 @@ import hashlib
 import spotipy
 import spotipy.util as util
 from spotipy.oauth2 import SpotifyClientCredentials
-from google.cloud.firestore_v1 import Increment
-from google.api_core.exceptions import ServiceUnavailable
-import firebase_admin
-from firebase_admin import credentials, firestore
 
 from gmail import Gmail
+from firebase import FireManager, ServiceUnavailable
 
 def print_track(track):
     with open(f"track.json", "w") as f:
         f.write(json.dumps(track))
-
-class FireManager():
-    """ Deals with all firebase interactions """
-    def __init__(self):
-        cred = credentials.Certificate("config.json")
-        fb = firebase_admin.initialize_app(cred, {
-            "project_id": "spotifydataexplorer-81773"
-        })
-        self.db = firestore.client()
-
-    def _add_listen(self, artist_collection, song_collection, history_doc, artist_id, track_id, track_details):
-        """ Adds a listen event to the firebase 
-        
-        Parameters
-        ----------
-        aritst_collection : firestore.collection - the collection for the song's artist
-
-        song_collection : firestore.collection - the collection for the song
-
-        history_doc : firestore.document - the firestore document representing the history document
-
-        artist_id : str - the id of the song's artist
-
-        track_id : str - the id of the song
-
-        track_details : dict - the information to add to firebase about the listen
-
-        Returns
-        -------
-        None
-        
-        """
-        # Update Artist
-        artist_collection.document(artist_id).update({
-            "listen_count": Increment(1),
-            "listen_time": Increment(track_details["ms_played"]),
-            "last_listen_time": track_details["time_info"],
-            "last_listen": {"track_id":track_id, "song_name":track_details["song_name"]}
-        })
-
-        # Update Song
-        listen_info = self._get_time_info(track_details["timestamp"])
-        listen_info["duration"] = track_details["ms_played"]
-        song_collection.document(track_id).update({
-            "listen_count": Increment(1),
-            "listen_time": Increment(track_details["ms_played"]),
-            "last_listen": track_details["time_info"],
-            "listens": firestore.ArrayUnion([listen_info])
-        })
-
-        # Add to History
-        history_doc.update({
-            f"{track_details['time_info']['year']}" : {
-                f"{track_details['time_info']['month']}" : {
-                    "listen_count": Increment(1),
-                    "listen_time": Increment(track_details["ms_played"]),
-                    "uq_artists": firestore.ArrayUnion([{"artist_id":artist_id, "artist_name":track_details["artist_name"]}]),
-                    "uq_songs": firestore.ArrayUnion([{"track_id":track_id, "song_name":track_details["song_name"]}])
-                }
-            }
-        })
-        
-    def _get_time_info(self, dt):
-        """ Gets a dictionary of the elements of the datetime 
-        
-        Parameters
-        ----------
-        dt : datetime - the datetime object
-
-        Returns
-        -------
-        dict - a dictionary of datetime components
-        """
-        info = {}
-        info["year"] = dt.date().year
-        info["month"] = dt.date().month
-        info["day"] = dt.date().day
-        info["weekday"] = dt.weekday()
-        info["hour"] = dt.time().hour
-        return info
-
-    def _init_artist(self, artist_collection, artist_id, track_id, track_details):
-        """ Adds a new artist to firebase for the first time 
-        
-        Parameters
-        ----------
-        aritst_collection : firestore.collection - the collection for the song's artist
-
-        artist_id : str - the id of the song's artist
-
-        track_id : str - the id of the first song played
-
-        track_details : dict - the information to add to firebase about the artist and first song
-
-        Returns
-        -------
-        None
-        """
-        doc_ref = artist_collection.document(artist_id)
-        doc_ref.set({
-            "artist_id": artist_id,
-            "artist_name": track_details["artist_name"],
-            "first_listen_time": self._get_time_info(track_details["timestamp"]),
-            "first_listen": {"track_id":track_id, "song_name":track_details["song_name"]},
-            "listen_count": 0,
-            "listen_time": 0,
-            "tracks": [],
-        })
-
-        self.db.collection(u"utils").document(u"artist_list").update({
-            "list": firestore.ArrayUnion([{"artist_id":artist_id, "artist_name":track_details["artist_name"]}])
-        })
-
-    def _init_history(self, history_doc, year):
-        """ Adds the year to the history document in firebase 
-        
-        Parameters
-        ----------
-        history_doc : firestore.document - the firestore document representing the history document
-
-        year : int - the year to add
-
-        Returns
-        -------
-        None
-        """
-        months = {}
-        for month in range(1, 13):
-            months[f"{month}"] = {
-                "listen_count": 0,
-                "listen_time": 0,
-                "uq_artists": [],
-                "uq_songs": []
-            }
-        history_doc.update({
-            f"{year}": months
-        })
-
-    def _init_song(self, artist_collection, song_collection, artist_id, track_id, track_details):
-        """ Adds a new song to firebase for the first time 
-        
-        Parameters
-        ----------
-        aritst_collection : firestore.collection - the collection for the song's artist
-
-        song_collection : firestore.collection - the collection for the song
-
-        artist_id : str - the id of the song's artist
-
-        track_id : str - the id of the song
-
-        track_details : dict - the information to add to firebase about the song
-
-        Returns
-        -------
-        None
-        """
-        song_doc_ref = song_collection.document(track_id)
-        song_doc_ref.set({
-            "artist_id": artist_id,
-            "artist_name": track_details["artist_name"],
-            "duration": track_details["duration"],
-            "first_listen": self._get_time_info(track_details["timestamp"]),
-            "song_name": track_details["song_name"],
-            "track_id": track_id,
-            "listens": []
-        })
-
-        artist_doc_ref = artist_collection.document(artist_id)
-        artist_doc_ref.update({
-            "tracks": firestore.ArrayUnion([{"track_id":track_id, "song_name":track_details["song_name"]}])
-        })
-
-    def add_song(self, track_id, artist_id, track_details):
-        """ Adds a song to the firebase if it is not already in there. If it is, it increases the play count and time for the song and artist 
-        
-        Parameters
-        ----------
-        track_id : str - the id of the track
-
-        artist_id : str - the id of the artist
-
-        track_details : dict - the information about the track to add to firebase
-
-        Returns
-        -------
-        None
-        """
-        if artist_id == "":
-            artist_id = track_id
-        track_details["time_info"] = self._get_time_info(track_details["timestamp"])
-
-        # Check if artist exists
-        artist_collection = self.db.collection(u"artists")
-        artist = artist_collection.document(artist_id).get()
-        if not artist.exists:
-            self._init_artist(artist_collection, artist_id, track_id, track_details)
-
-        # Check if song exists
-        song_collection = self.db.collection(u"songs")
-        song = song_collection.document(track_id).get()
-        if not song.exists:
-            self._init_song(artist_collection, song_collection, artist_id, track_id, track_details)
-
-        # Check if history year exists
-        year = track_details["time_info"]["year"]
-        history_doc = self.db.collection(u"utils").document(u"history")
-        history = history_doc.get().to_dict()
-        if f"{year}" not in history:
-            self._init_history(history_doc, year)
-
-        # Increase stats
-        self._add_listen(artist_collection, song_collection, history_doc, artist_id, track_id, track_details)
-
-    def update_current(self, info):
-        """ Updates the information at overview/current
-        
-        Parameters
-        ----------
-        info : dict - the fields and values to add
-
-        Returns
-        -------
-        None
-        
-        """
-        doc_ref = self.db.collection(u"overview").document(u"current")
-        doc_ref.set(info)
 
 class Listener():
     """ Listens to the spotify songs and to give a notification of a new song being listened to
@@ -257,7 +26,6 @@ class Listener():
     None
     
     """
-
     def __init__(self):
         self.spotify = self._init_spotify()
         self.last_released_id = ''
@@ -520,7 +288,14 @@ class Listener():
                 print(msg)
                 time.sleep(30)
             except spotipy.exceptions.SpotifyException as e:
-                self.spotify = self._init_spotify()
+                try:
+                    self.spotify = self._init_spotify()
+                except:
+                    msg = f"Could not init spotify: {sys.exc_info()[0]}"
+                    print(msg)
+                    gmail.send_message(msg)
+                    raise
+                    exit()
             except:
                 msg = f"Unhandled Error: {sys.exc_info()[0]}"
                 print(msg)
