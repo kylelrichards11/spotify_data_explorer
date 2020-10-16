@@ -6,6 +6,7 @@ import re
 import requests
 import sys
 import hashlib
+import traceback
 
 import spotipy
 import spotipy.util as util
@@ -239,7 +240,6 @@ class Listener():
         """
         
         gmail = Gmail()
-        gmail.send_message("Starting Listen")
         last_track = self.spotify.current_user_playing_track()
         last_id = self._get_track_id(last_track)
 
@@ -262,7 +262,7 @@ class Listener():
                     track_duration = self._get_track_duration(last_id)
                     last_info = self._get_info(last_track, track_duration=track_duration)
 
-                # Add info to json (if any)
+                # Add info to database (if any)
                 should_release = self._should_release(last_id) if last_info is not None else False
                 if should_release:
                     artist_id = self._get_artist_id(last_track)
@@ -283,6 +283,7 @@ class Listener():
                 # Wait 10 seconds
                 time.sleep(10)
 
+            # Check for errors
             except requests.exceptions.ReadTimeout as e:
                 msg = f"ReadTimeout {e}"
                 print(msg)
@@ -291,17 +292,23 @@ class Listener():
                 try:
                     self.spotify = self._init_spotify()
                 except:
-                    msg = f"Could not init spotify: {sys.exc_info()[0]}"
+                    tb = ''.join(traceback.format_tb(sys.exc_info()[2]))
+                    msg = f"Could not init spotify: {sys.exc_info()[0]}\nTraceback:\n{tb}"
                     print(msg)
                     gmail.send_message(msg)
-                    raise
                     exit()
+            except UnboundLocalError as e:
+                tb = ''.join(traceback.format_tb(e.__traceback__))
+                msg = f"Unbound Local Error {e}\nTraceback:\n{tb}"
+                print(msg)
+                gmail.send_message(msg)
+                time.sleep(30)
             except:
-                msg = f"Unhandled Error: {sys.exc_info()[0]}"
+                tb = ''.join(traceback.format_tb(sys.exc_info()[2]))
+                msg = f"Unhandled Error: {sys.exc_info()[0]}\nTraceback:\n{tb}"
                 print(msg)
                 gmail.send_message(msg)
                 raise
-                exit()
 
 if __name__ == "__main__":
     listener = Listener()
