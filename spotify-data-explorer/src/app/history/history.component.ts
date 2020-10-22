@@ -97,10 +97,17 @@ export interface SongListItem {
 
     ngOnInit() {
         // Subscribe to history
-        for(let year in YEAR_EMPTY) {
-            const year_doc = this.afs.doc<Item>('history/' + year)
-            this.history_items[year] = year_doc.valueChanges()
-            this.history_items[year].subscribe(val => this.year_subscribe(val, year))
+        for(let year in YEAR_EMPTY){
+            this.history_items[String(year)] = {}
+            this.history_docs[String(year)] = {}
+        }
+        for(let month_year in MONTH_EMPTY) {
+            let split = month_year.split('/')
+            let month = split[0]
+            let year = split[1]
+            const month_doc = this.afs.doc<Item>('history_' + year + '/' + month)
+            this.history_items[year][month] = month_doc.valueChanges()
+            this.history_items[year][month].subscribe(val => this.month_subscribe(val, year, month))
         }
 
         // Init graph
@@ -157,8 +164,8 @@ export interface SongListItem {
         });
     }
 
-    year_subscribe(val, year) {
-        this.history_docs[year] = val
+    month_subscribe(val, year, month) {
+        this.history_docs[year][month] = val
         this.populate_info()
         this.set_chart_data()
     }
@@ -328,7 +335,6 @@ export interface SongListItem {
 
     change_timescale(timescale) {
         this.active_dataset_time = timescale;
-        console.log(this.datasets["year"]["times"])
         this.graph["data"]["labels"] = this.labels[timescale]
         this.graph["data"]["datasets"][0]["data"] = this.datasets[timescale][this.active_dataset_stat]
         this.graph["options"]["scales"]["xAxes"][0]["scaleLabel"]["labelString"] = this.xlabels[timescale]
