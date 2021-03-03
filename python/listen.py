@@ -188,24 +188,49 @@ class Listener():
         token = util.prompt_for_user_token(username, scope, client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri)
         return spotipy.Spotify(auth=token)
         
-    def _should_release(self, id):
-        """ Decides to release info or not 
+    def _should_release(self, current_id, last_id, last_track):
+        """ Decides to release info for the last track or not 
         
         Parameters
         ----------
-        id : str - the id of the last played song
+        current_id : str - the id of the currently playing song
+        
+        last_id : str - the id of the last played song
+
+        last_track : dict - the info about the last track
 
         Returns
         -------
         boolean - True if info should be released false otherwise
-
         """
+        
+        # Check if song has changed
+        if current_id == last_id:
+            return False, None
+        
+        # Check if we just released this song
+        if last_id == self.last_released_id:
+            return False, None
+
+        # Check if we just released anything
         now = datetime.now().timestamp()
-        if id != self.last_released_id or now - self.last_released_sec > 22:
-            self.last_released_id = id
-            self.last_released_sec = now
-            return True
-        return False
+        if now - self.last_released_sec <= 22:
+            return False, None
+
+        # Check if we listened to at least half of the song
+        last_info = None
+        if last_track["currently_playing_type"] == "track" or last_track["currently_playing_type"] is None:
+            track_duration = self._get_track_duration(last_id)
+            last_info = self._get_info(last_track, track_duration=track_duration)
+            if track_duration > 0 and float(last_info["ms_played"])/float(track_duration) < 0.5:
+                # Reset last_released_id to allow next song to be released if it is the same as the
+                # previous song
+                self.last_released_id = "0"
+                return False, None
+
+        self.last_released_id = id
+        self.last_released_sec = now
+        return True, last_info
 
     def _update_current(self, track_id, track):
         """ Updates the track currently being listened to
@@ -256,15 +281,9 @@ class Listener():
 
                 current_id = self._get_track_id(current_track)
 
-                # Save info if current changed
-                last_info = None
-                if current_id != last_id and (last_track["currently_playing_type"] == "track" or last_track["currently_playing_type"] is None):
-                    track_duration = self._get_track_duration(last_id)
-                    last_info = self._get_info(last_track, track_duration=track_duration)
-
                 # Add info to database (if any)
-                should_release = self._should_release(last_id) if last_info is not None else False
-                if should_release:
+                should_release, last_info = self._should_release(current_id, last_id, last_track)
+                if should_release and last_info is not None:
                     artist_id = self._get_artist_id(last_track)
                     try:
                         self.firebase.add_song(last_id, artist_id, last_info)
