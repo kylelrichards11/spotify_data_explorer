@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 
 from google.cloud.firestore_v1 import Increment
@@ -20,6 +21,8 @@ class FireManager():
         self.artist_collection = self.db.collection(u"artists")
         self.song_collection = self.db.collection(u"songs")
         self.artist_list_doc = self.db.collection(u"utils").document(u"artist_list")
+        self.prev_week_doc = self.db.collection(u"overview").document(u"prev_week")
+        self.prev_week_stage_doc = self.db.collection(u"overview").document(u"prev_week_stage")
         years = list(range(2013, 2022))
         years.remove(2014)
         self.history_collections = {}
@@ -388,8 +391,73 @@ class FireManager():
         song_doc_ref = self.song_collection.document(track_id)
         song_doc_ref.set(track_info)
 
+    def add_to_week(self, track_id, artist_id, track_details):
+        """ Adds to previous week's list of songs
+        """
+        self.prev_week_doc.update({
+            "tracks": firestore.ArrayUnion([{
+                "artist_id": artist_id,
+                "artist_name": track_details["artist_name"],
+                "listen_time": track_details["ms_played"],
+                "song_name": track_details["song_name"],
+                "track_id": track_id,
+                "timestamp": track_details["timestamp"]
+            }])
+        })
+
+    def get_prev_week(self):
+        """ Gets the previous week doc from firebase
+        
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        dict - the previous week doc in a dictionary
+        """
+        return self.prev_week_doc.get().to_dict()
+
+    def set_prev_week(self, tracks, stage=True):
+        """ Sets the previous week doc to tracks
+
+        Parameters
+        ----------
+        tracks (dict) : the tracks to add to prev week.
+
+        stage (bool, default=True) : whether to write to stage or regular
+
+        Returns
+        -------
+        None
+        """
+        doc = self.prev_week_stage_doc if stage else self.prev_week_doc
+        doc.set(tracks)
+
+    # def query_top_weekly(self, start, end, n=20):
+    #     """ Returns the top 25 most played songs by listens in the given time interval
+        
+    #     Parameters
+    #     ----------
+    #     start : string in form YYYY-MM-DD
+
+    #     end : 
+        
+    #     Returns
+    #     -------
+    #     None
+    #     """
+    #     start = datetime.strptime(start, "%Y-%m-%d")
+    #     end = datetime.strptime(end, "%Y-%m-%d")
+    #     query = self.prev_week_collection.order_by(u'listens').order_by(u'listen_time').limit(n)
+    #     results = query.stream()
+    #     print(results)
+    #     for r in results:
+    #         print(r.id)
+
 if __name__ == "__main__":
     fb = FireManager()
+    # fb.query_top_weekly("2021-03-07", "2021-03-08", 5)
     # with open("firebase_history_temp.json", "r") as f:
     #     history = json.load(f)
     # fb.set_history(history)
