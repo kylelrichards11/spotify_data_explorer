@@ -433,31 +433,3 @@ class FireManager():
         """
         doc = self.prev_week_stage_doc if stage else self.prev_week_doc
         doc.set(tracks)
-
-    # def query_top_weekly(self, start, end, n=20):
-    #     """ Returns the top 25 most played songs by listens in the given time interval
-        
-    #     Parameters
-    #     ----------
-    #     start : string in form YYYY-MM-DD
-
-    #     end : 
-        
-    #     Returns
-    #     -------
-    #     None
-    #     """
-    #     start = datetime.strptime(start, "%Y-%m-%d")
-    #     end = datetime.strptime(end, "%Y-%m-%d")
-    #     query = self.prev_week_collection.order_by(u'listens').order_by(u'listen_time').limit(n)
-    #     results = query.stream()
-    #     print(results)
-    #     for r in results:
-    #         print(r.id)
-
-if __name__ == "__main__":
-    fb = FireManager()
-    # fb.query_top_weekly("2021-03-07", "2021-03-08", 5)
-    # with open("firebase_history_temp.json", "r") as f:
-    #     history = json.load(f)
-    # fb.set_history(history)

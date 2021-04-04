@@ -7,7 +7,7 @@ from firebase import FireManager
 from spotify import Spotify
 
 def get_date_range():
-    end = datetime.now()
+    end = datetime.now() + timedelta(days=1)
     end = datetime(end.year, end.month, end.day)
     start = end - timedelta(days=7)
     time_str = "%Y-%m-%d %H:%M"
@@ -25,6 +25,7 @@ def trim_to_week(df):
     return df.loc[start:end, :]
 
 def set_prev_week(fb, df, stage=True):
+    df["timestamp"] = df.index
     df_dict = df.to_dict(orient="records")
     fb.set_prev_week({"tracks": df_dict}, stage=stage)
 
