@@ -8,10 +8,10 @@ import time
 class Spotify():
     def __init__(self):
         self.username = "1275479048"
-        self.sp = self._auth()
+        self.sp = self.refresh_auth_token()
         self.top_25_playlist = "3gRC5uapfncEioUxJ6qThX"
 
-    def _auth(self):
+    def refresh_auth_token(self):
         client_id = os.environ["SPOTIPY_CLIENT_ID"]
         client_secret = os.environ["SPOTIPY_CLIENT_SECRET"]
         redirect_uri = "http://localhost:8888/callback"

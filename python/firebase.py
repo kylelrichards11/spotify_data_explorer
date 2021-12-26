@@ -101,6 +101,8 @@ class FireManager():
         info["day"] = dt.date().day
         info["weekday"] = dt.weekday()
         info["hour"] = dt.time().hour
+        info["minute"] = dt.time().minute
+        info["second"] = dt.time().second
         return info
 
     def _init_artist(self, artist_id, track_id, track_details):

@@ -8,8 +8,8 @@ import { map, startWith } from 'rxjs/operators';
 import { Chart } from 'chart.js';
 
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-const MONTH_KEYS = ['10/2015', '11/2015', '12/2015', '1/2016', '2/2016', '3/2016', '4/2016', '5/2016', '6/2016', '7/2016', '8/2016', '9/2016', '10/2016', '11/2016', '12/2016', '1/2017', '2/2017', '3/2017', '4/2017', '5/2017', '6/2017', '7/2017', '8/2017', '9/2017', '10/2017', '11/2017', '12/2017', '1/2018', '2/2018', '3/2018', '4/2018', '5/2018', '6/2018', '7/2018', '8/2018', '9/2018', '10/2018', '11/2018', '12/2018', '1/2019', '2/2019', '3/2019', '4/2019', '5/2019', '6/2019', '7/2019', '8/2019', '9/2019', '10/2019', '11/2019', '12/2019', '1/2020', '2/2020', '3/2020', '4/2020', '5/2020', '6/2020', '7/2020', '8/2020', '9/2020', '10/2020', '11/2020', '12/2020', '1/2021', '2/2021', '3/2021', '4/2021', '5/2021', '6/2021', '7/2021', '8/2021', '9/2021', '10/2021', '11/2021', '12/2021']
-const YEAR_KEYS = [2015, 2016, 2017, 2018, 2019, 2020, 2021]
+const MONTH_KEYS = ['10/2015', '11/2015', '12/2015', '1/2016', '2/2016', '3/2016', '4/2016', '5/2016', '6/2016', '7/2016', '8/2016', '9/2016', '10/2016', '11/2016', '12/2016', '1/2017', '2/2017', '3/2017', '4/2017', '5/2017', '6/2017', '7/2017', '8/2017', '9/2017', '10/2017', '11/2017', '12/2017', '1/2018', '2/2018', '3/2018', '4/2018', '5/2018', '6/2018', '7/2018', '8/2018', '9/2018', '10/2018', '11/2018', '12/2018', '1/2019', '2/2019', '3/2019', '4/2019', '5/2019', '6/2019', '7/2019', '8/2019', '9/2019', '10/2019', '11/2019', '12/2019', '1/2020', '2/2020', '3/2020', '4/2020', '5/2020', '6/2020', '7/2020', '8/2020', '9/2020', '10/2020', '11/2020', '12/2020', '1/2021', '2/2021', '3/2021', '4/2021', '5/2021', '6/2021', '7/2021', '8/2021', '9/2021', '10/2021', '11/2021', '12/2021', '1/2022', '2/2022', '3/2022', '4/2022', '5/2022', '6/2022', '7/2022', '8/2022', '9/2022', '10/2022', '11/2022', '12/2022']
+const YEAR_KEYS = [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022]
 
 export interface Item { name: string; }
 
@@ -62,16 +62,16 @@ export class ArtistsComponent implements OnInit {
     active_artist_dataset_time = "month";
     active_artist_dataset_stat = "counts";
     active_artist_time_unit = {
-        "month":"",
-        "year":""
+        "month": "",
+        "year": ""
     }
     artist_datasets = {
-        "year" : {
+        "year": {
             "counts": [],
             "times": [],
             "uq_songs": []
         },
-        "month" : {
+        "month": {
             "counts": [],
             "times": [],
             "uq_songs": []
@@ -81,16 +81,16 @@ export class ArtistsComponent implements OnInit {
     active_song_dataset_time = "month";
     active_song_dataset_stat = "counts";
     active_song_time_unit = {
-        "month":"",
-        "year":""
+        "month": "",
+        "year": ""
     }
     song_datasets = {
-        "year" : {
+        "year": {
             "counts": [],
             "times": [],
             "uq_songs": []
         },
-        "month" : {
+        "month": {
             "counts": [],
             "times": [],
             "uq_songs": []
@@ -103,15 +103,15 @@ export class ArtistsComponent implements OnInit {
     }
 
     titles = {
-        "times" : {
+        "times": {
             "year": " Listened per Year",
             "month": " Listened per Month"
         },
-        "counts" : {
+        "counts": {
             "year": "Listens per Year",
             "month": "Listens per Month"
         },
-        "uq_songs" : {
+        "uq_songs": {
             "year": "Unique Songs per Year",
             "month": "Unique Songs per Month"
         }
@@ -148,7 +148,7 @@ export class ArtistsComponent implements OnInit {
             "type": "bar",
             "data": {
                 "datasets": [{
-                    data: [0, 0, 0, 0, 0, 0, 0],
+                    data: [0, 0, 0, 0, 0, 0, 0, 0],
                     backgroundColor: '#08a1d4'
                 }],
                 "labels": this.labels["month"]
@@ -156,7 +156,7 @@ export class ArtistsComponent implements OnInit {
             "options": {
                 maintainAspectRatio: false,
                 responsive: true,
-                scales : {
+                scales: {
                     xAxes: [{
                         ticks: {
                             fontColor: "black"
@@ -201,7 +201,7 @@ export class ArtistsComponent implements OnInit {
             "type": "bar",
             "data": {
                 "datasets": [{
-                    data: [0, 0, 0, 0, 0, 0, 0],
+                    data: [0, 0, 0, 0, 0, 0, 0, 0],
                     backgroundColor: '#08a1d4'
                 }],
                 "labels": this.labels["month"]
@@ -209,7 +209,7 @@ export class ArtistsComponent implements OnInit {
             "options": {
                 maintainAspectRatio: false,
                 responsive: true,
-                scales : {
+                scales: {
                     xAxes: [{
                         ticks: {
                             fontColor: "black"
@@ -284,7 +284,7 @@ export class ArtistsComponent implements OnInit {
         this.artist_listen_time = time_info[0]
         this.artist_listen_time_unit = time_info[1].toLowerCase()
         this.unique_songs = val["tracks"].length;
-        
+
         (<HTMLAnchorElement>document.getElementById("first_song_link")).href = '/song/' + val["first_listen"]["track_id"]
         this.artist_first_song_name = val["first_listen"]["song_name"]
         let flt = val["first_listen_time"]
@@ -294,7 +294,7 @@ export class ArtistsComponent implements OnInit {
         this.artist_last_song_name = val["last_listen"]["song_name"]
         let llt = val["last_listen_time"]
         this.artist_last_song_date = MONTHS[llt["month"] - 1] + " " + llt["day"] + ", " + llt["year"]
-        
+
         this.set_artist_chart_data(val["tracks"])
         this.update_song_options(val);
     }
@@ -331,7 +331,7 @@ export class ArtistsComponent implements OnInit {
             month_counts[listen_month] += 1;
             month_times[listen_month] += ms_played;
         }
-        
+
         // Calculate year values
         var year_count_data = []
         var year_time_data = []
@@ -340,7 +340,7 @@ export class ArtistsComponent implements OnInit {
         var max_year;
         for (let year in year_times) {
             let year_time = year_times[year]
-            if(year_time > max_year_time) {
+            if (year_time > max_year_time) {
                 max_year_time = year_time;
                 max_year = year;
             }
@@ -349,7 +349,7 @@ export class ArtistsComponent implements OnInit {
         this.active_song_time_unit["year"] = year_unit;
 
         for (let year in year_counts) {
-            year_count_data.push(year_counts[year])    
+            year_count_data.push(year_counts[year])
         }
         for (let year in year_times) {
             year_time_data.push(this.transform_time_unit(year_times[year], year_unit))
@@ -366,7 +366,7 @@ export class ArtistsComponent implements OnInit {
         var max_month;
         for (let month in month_times) {
             let month_time = month_times[month]
-            if(month_time > max_month_time) {
+            if (month_time > max_month_time) {
                 max_month_time = month_time;
                 max_month = month;
             }
@@ -375,7 +375,7 @@ export class ArtistsComponent implements OnInit {
         this.active_song_time_unit["month"] = month_unit;
 
         for (let month in month_counts) {
-            month_count_data.push(month_counts[month])    
+            month_count_data.push(month_counts[month])
         }
         for (let month in month_times) {
             month_time_data.push(this.transform_time_unit(month_times[month], month_unit))
@@ -397,7 +397,7 @@ export class ArtistsComponent implements OnInit {
         let arr = (timescale == "year") ? YEAR_KEYS : MONTH_KEYS;
         var my_dict = {}
         arr.forEach(key => {
-            if(default_val == "set") {
+            if (default_val == "set") {
                 my_dict[key] = new Set();
             }
             else {
@@ -424,11 +424,11 @@ export class ArtistsComponent implements OnInit {
             let pc = this.tracks[track_id]["listen_count"]
             let play_time = this.tracks[track_id]["listen_time"]
             let song_name = this.tracks[track_id]["song_name"]
-            if(pc > highest_pc) {
+            if (pc > highest_pc) {
                 highest_pc = pc;
                 highest_pc_song = song_name;
             }
-            if(play_time > highest_time) {
+            if (play_time > highest_time) {
                 highest_time = play_time;
                 highest_time_song = song_name
             }
@@ -461,7 +461,7 @@ export class ArtistsComponent implements OnInit {
         var max_year;
         for (let year in year_times) {
             let year_time = year_times[year]
-            if(year_time > max_year_time) {
+            if (year_time > max_year_time) {
                 max_year_time = year_time;
                 max_year = year;
             }
@@ -470,7 +470,7 @@ export class ArtistsComponent implements OnInit {
         this.active_artist_time_unit["year"] = year_unit;
 
         for (let year in year_counts) {
-            year_count_data.push(year_counts[year])    
+            year_count_data.push(year_counts[year])
         }
         for (let year in year_times) {
             year_time_data.push(this.transform_time_unit(year_times[year], year_unit))
@@ -492,7 +492,7 @@ export class ArtistsComponent implements OnInit {
         var max_month;
         for (let month in month_times) {
             let month_time = month_times[month]
-            if(month_time > max_month_time) {
+            if (month_time > max_month_time) {
                 max_month_time = month_time;
                 max_month = month;
             }
@@ -501,7 +501,7 @@ export class ArtistsComponent implements OnInit {
         this.active_artist_time_unit["month"] = month_unit;
 
         for (let month in month_counts) {
-            month_count_data.push(month_counts[month])    
+            month_count_data.push(month_counts[month])
         }
         for (let month in month_times) {
             month_time_data.push(this.transform_time_unit(month_times[month], month_unit))
@@ -549,13 +549,13 @@ export class ArtistsComponent implements OnInit {
         this.artist_graph["data"]["labels"] = this.labels[timescale]
         this.artist_graph["data"]["datasets"][0]["data"] = this.artist_datasets[timescale][this.active_artist_dataset_stat]
         this.artist_graph["options"]["scales"]["xAxes"][0]["scaleLabel"]["labelString"] = this.xlabels[timescale]
-        if(this.active_artist_dataset_stat == "times") {
+        if (this.active_artist_dataset_stat == "times") {
             this.artist_graph["options"]["title"]["text"] = this.active_artist_time_unit[timescale] + this.titles[this.active_artist_dataset_stat][timescale]
         }
         else {
             this.artist_graph["options"]["title"]["text"] = this.titles[this.active_artist_dataset_stat][timescale]
         }
-        if(this.active_artist_dataset_stat == "times") {
+        if (this.active_artist_dataset_stat == "times") {
             this.artist_graph["options"]["scales"]["yAxes"][0]["scaleLabel"]["labelString"] = this.active_artist_time_unit[timescale]
         }
         this.artist_graph.update()
@@ -564,13 +564,13 @@ export class ArtistsComponent implements OnInit {
     change_artist_stat(stat) {
         this.active_artist_dataset_stat = stat;
         this.artist_graph["data"]["datasets"][0]["data"] = this.artist_datasets[this.active_artist_dataset_time][stat]
-        if(stat == "times") {
+        if (stat == "times") {
             this.artist_graph["options"]["scales"]["yAxes"][0]["scaleLabel"]["labelString"] = this.active_artist_time_unit[this.active_artist_dataset_time]
         }
         else {
             this.artist_graph["options"]["scales"]["yAxes"][0]["scaleLabel"]["labelString"] = this.ylabels[stat]
         }
-        if(stat == "times") {
+        if (stat == "times") {
             this.artist_graph["options"]["title"]["text"] = this.active_artist_time_unit[this.active_artist_dataset_time] + this.titles[stat][this.active_artist_dataset_time]
         }
         else {
@@ -584,13 +584,13 @@ export class ArtistsComponent implements OnInit {
         this.song_graph["data"]["labels"] = this.labels[timescale]
         this.song_graph["data"]["datasets"][0]["data"] = this.song_datasets[timescale][this.active_song_dataset_stat]
         this.song_graph["options"]["scales"]["xAxes"][0]["scaleLabel"]["labelString"] = this.xlabels[timescale]
-        if(this.active_song_dataset_stat == "times") {
+        if (this.active_song_dataset_stat == "times") {
             this.song_graph["options"]["title"]["text"] = this.active_song_time_unit[timescale] + this.titles[this.active_song_dataset_stat][timescale]
         }
         else {
             this.song_graph["options"]["title"]["text"] = this.titles[this.active_song_dataset_stat][timescale]
         }
-        if(this.active_song_dataset_stat == "times") {
+        if (this.active_song_dataset_stat == "times") {
             this.song_graph["options"]["scales"]["yAxes"][0]["scaleLabel"]["labelString"] = this.active_song_time_unit[timescale]
         }
         this.song_graph.update()
@@ -599,13 +599,13 @@ export class ArtistsComponent implements OnInit {
     change_song_stat(stat) {
         this.active_song_dataset_stat = stat;
         this.song_graph["data"]["datasets"][0]["data"] = this.song_datasets[this.active_song_dataset_time][stat]
-        if(stat == "times") {
+        if (stat == "times") {
             this.song_graph["options"]["scales"]["yAxes"][0]["scaleLabel"]["labelString"] = this.active_song_time_unit[this.active_song_dataset_time]
         }
         else {
             this.song_graph["options"]["scales"]["yAxes"][0]["scaleLabel"]["labelString"] = "Listens"
         }
-        if(stat == "times") {
+        if (stat == "times") {
             this.song_graph["options"]["title"]["text"] = this.active_song_time_unit[this.active_song_dataset_time] + this.titles[stat][this.active_song_dataset_time]
         }
         else {

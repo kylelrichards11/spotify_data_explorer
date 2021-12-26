@@ -117,6 +117,7 @@ def set_week_playlist_task(sp, top_ids):
     top_ids (list): A list of track ids to add to the playlist. The order of the
     list is the order the tracks will be in the playlist.
     """
+    sp.refresh_auth_token()
     sp.set_week_playlist(top_ids)
 
 
@@ -152,14 +153,15 @@ def build_update_playlist_flow(name):
     """
     fb = FireManager()
     sp = Spotify()
+    now = datetime.now(pytz.UTC)
     schedule = IntervalSchedule(
-        start_date = datetime(2021, 4, 26, 7, 0, 0, 0, pytz.UTC),
-        interval = timedelta(hours=24),
+        start_date=datetime(now.year, now.month, now.day, 7, 0, 0, 0, pytz.UTC),
+        interval=timedelta(hours=24),
     )
-    with Flow(name, schedule=schedule) as flow:
+    with Flow(name, schedule=None) as flow:
         df = get_prev_week_tracks_task(fb)
         df = trim_to_week_task(df)
-        update_prev_week_task(fb, df, stage=True)
+        update_prev_week_task(fb, df, stage=False)
         top = get_top_tracks_task(df, k=25)
         set_week_playlist_task(sp, top)
     return flow

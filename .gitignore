@@ -11,3 +11,6 @@ credentials.json
 environment.ts
 environment.prod.ts
 .firebase
+*.json
+*.csv
+*.mov

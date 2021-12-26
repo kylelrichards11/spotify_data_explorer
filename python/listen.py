@@ -35,6 +35,8 @@ class Listener():
         self.firebase = FireManager()
         self.id_map = {
             "Arctic Monkeys": "7Ln80lUS6He07XvHI8qqHH",
+            "FKA Twigs": "6nB0iY1cjSY1KyhYyuIIKH",
+            "FKA twigs": "6nB0iY1cjSY1KyhYyuIIKH",
             "Hozier": "2FXC3k01G6Gw61bmprjgqS",
             "Joyner Lucas": "6C1ohJrd5VydigQtaGy5Wa",
             "Tash Sultana": "6zVFRTB0Y1whWyH7ZNmywf",
